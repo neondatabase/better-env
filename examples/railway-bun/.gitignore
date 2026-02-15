@@ -1,0 +1,11 @@
+# dependencies
+node_modules
+
+# env files
+.env*
+
+# railway link metadata
+.railway
+
+# misc
+.DS_Store
