@@ -11,6 +11,8 @@ export { vercelAdapter } from "./lib/adapters/vercel.ts";
 export type { VercelAdapterOptions } from "./lib/adapters/vercel.ts";
 export { netlifyAdapter } from "./lib/adapters/netlify.ts";
 export type { NetlifyAdapterOptions } from "./lib/adapters/netlify.ts";
+export { cloudflareAdapter } from "./lib/adapters/cloudflare.ts";
+export type { CloudflareAdapterOptions } from "./lib/adapters/cloudflare.ts";
 
 export {
   configSchema,

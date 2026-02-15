@@ -1,6 +1,6 @@
 # better-env
 
-`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms.
+`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify and Cloudflare).
 
 ## Introduction
 
@@ -76,6 +76,7 @@ If you're using a supported hosting provider, you can use the `better-env` CLI t
 - Provider CLI available in `$PATH`
   - Vercel adapter: `vercel` (or set `vercelBin`)
   - Netlify adapter: `netlify` (or set `netlifyBin`)
+  - Cloudflare adapter: `wrangler` (or set `wranglerBin`)
 
 ### Configure `better-env.ts`
 
@@ -96,6 +97,16 @@ import { defineBetterEnv, netlifyAdapter } from "better-env";
 
 export default defineBetterEnv({
   adapter: netlifyAdapter(),
+});
+```
+
+Cloudflare Workers example:
+
+```ts
+import { cloudflareAdapter, defineBetterEnv } from "better-env";
+
+export default defineBetterEnv({
+  adapter: cloudflareAdapter(),
 });
 ```
 
@@ -123,6 +134,13 @@ For Netlify adapter, the same local names map to:
 - `production` → Netlify `production`
 - `test` → local-only (no remote mapping)
 
+For Cloudflare adapter, the same local names map to Workers environments:
+
+- `development` → Wrangler `--env development`
+- `preview` → Wrangler `--env preview`
+- `production` → Wrangler default environment (no `--env` flag)
+- `test` → local-only (no remote mapping)
+
 You can override (or add) environments in `better-env.ts`:
 
 ```ts
@@ -139,11 +157,17 @@ export default defineBetterEnv({
 });
 ```
 
-Note: `better-env` never writes to `.env.local` (use it as your local override).
+Notes: `better-env` never writes to `.env.local` (use it as your local override).
+
+### Cloudflare + better-env
+
+- `better-env pull` is not supported for Cloudflare secrets (Wrangler cannot read back secret values).
+- `wrangler dev` (local mode) does not inject remote secrets into local dotenv files so it's on you to keep your local env vars in sync with the remote environment. Or run `wrangler dev --remote` to use deployed environment bindings at runtime.
+- Recommended workflow: keep local files (`.env.*` / `.dev.vars`) as source of truth, then push with `better-env load`.
 
 ## CLI Command Reference
 
-- `init`: validates provider CLI availability and verifies project linkage (`.vercel/project.json` or `.netlify/state.json`)
+- `init`: validates provider CLI availability and verifies project linkage when required (`.vercel/project.json` or `.netlify/state.json`)
 - `pull`: fetches remote variables and ensures local `.gitignore` coverage
 - `validate`: validates required variables by loading `config.ts` modules
 - `add|upsert|update|delete`: applies single-variable mutations to the remote provider
@@ -181,3 +205,5 @@ Run adapter e2e coverage:
   - Run with `npm run test:e2e:vercel`
 - Netlify adapter runtime e2e test:
   - Run with `bun test test/e2e/runtime-netlify.test.ts`
+- Cloudflare adapter runtime e2e test:
+  - Run with `bun test test/e2e/runtime-cloudflare.test.ts`
