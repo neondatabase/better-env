@@ -108,6 +108,23 @@ If your app uses the `configSchema` pattern (configs in `src/lib/*/config.ts`), 
 better-env validate --environment development
 ```
 
+## Live Vercel E2E Test
+
+This repo includes a live Bun e2e test that copies `examples/next-demo` into
+`e2e/test-apps/next`, creates a fresh Vercel project, runs the env command
+matrix, and then removes both the test app copy and the Vercel project.
+
+Prerequisites:
+
+- `vercel` CLI authenticated
+- access to create/remove projects in your Vercel scope
+
+Run:
+
+```bash
+npm run test:e2e:vercel
+```
+
 ## Config Schema Utility (from fullstackrecipes)
 
 ```ts

@@ -1,0 +1,43 @@
+{
+  "name": "next-demo",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "better-env run -- bun run dev:next",
+    "dev:next": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "env:init": "better-env init --yes",
+    "env:pull": "better-env pull --environment development",
+    "env:validate": "better-env validate --environment development",
+    "env:list": "better-env environments list",
+    "env:verify": "./scripts/verify-cli.sh"
+  },
+  "dependencies": {
+    "better-env": "link:better-env",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
+}

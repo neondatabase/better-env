@@ -17,7 +17,8 @@ export async function validateEnv(
   const projectDir = options.projectDir ?? process.cwd();
   const environment =
     options.environment ?? process.env.NODE_ENV ?? "development";
-  process.env.NODE_ENV = environment;
+  // Node's ProcessEnv type may mark NODE_ENV as readonly in newer typings.
+  (process.env as Record<string, string | undefined>).NODE_ENV = environment;
 
   console.log(bold("\n🔍 Environment Configuration Validator\n"));
   console.log(dim(`  Environment: ${environment}\n`));
