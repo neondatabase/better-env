@@ -112,9 +112,6 @@ async function writeConfig(projectDir: string): Promise<void> {
     "",
     "export default defineBetterEnv({",
     `  adapter: vercelAdapter({ vercelBin: ${JSON.stringify(fakeVercelBin)} }),`,
-    "  runtime: {",
-    `    devCommand: [\"bun\", \"-e\", \"console.log('dev')\"],`,
-    "  },",
     "});",
     "",
   ].join("\n");

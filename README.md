@@ -4,7 +4,7 @@
 
 ## What You Get (v1)
 
-- `better-env run -- <cmd>`: pull latest env vars, ensure gitignore, then run a command
+- `better-env pull`: pull latest env vars and ensure gitignore coverage
 - `better-env init`: verify `vercel` is installed and the project is linked (`.vercel/project.json`)
 - `better-env add|upsert|update|delete`: manage remote env vars
 - `better-env load <file> --mode upsert|add|update|replace`: apply a dotenv file to remote env vars
@@ -25,10 +25,6 @@ import { defineBetterEnv, vercelAdapter } from "better-env";
 
 export default defineBetterEnv({
   adapter: vercelAdapter(),
-  runtime: {
-    // Used by `better-env dev`
-    devCommand: ["next", "dev"],
-  },
 });
 ```
 
@@ -36,14 +32,8 @@ Then:
 
 ```bash
 better-env init
-better-env pull
-better-env run -- next dev
-```
-
-If you want the nicest workflow, use:
-
-```bash
-better-env dev
+better-env pull --environment development
+bun run dev
 ```
 
 ## Environments
@@ -78,8 +68,7 @@ export default defineBetterEnv({
 ```bash
 better-env init [--yes]
 better-env pull [--environment <name>]
-better-env dev [--environment <name>]
-better-env run [--environment <name>] -- <command...>
+better-env validate [--environment <name>]
 
 better-env add <key> <value> [--environment <name>] [--sensitive]
 better-env upsert <key> <value> [--environment <name>] [--sensitive]

@@ -33,12 +33,6 @@ export type BetterEnvConfig = {
      */
     ensure?: boolean;
   };
-  runtime?: {
-    /**
-     * The command executed by `better-env dev` (defaults to `bun run dev`).
-     */
-    devCommand?: string[];
-  };
 };
 
 export type BetterEnvAdapter = {

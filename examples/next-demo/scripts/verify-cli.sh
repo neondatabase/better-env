@@ -80,7 +80,6 @@ run "$BE_BIN" load "${TEMP_ENV_FILES[3]}" --environment development --mode repla
 run "$BE_BIN" pull --environment development
 run "$BE_BIN" pull --environment preview
 run "$BE_BIN" pull --environment production
-run "$BE_BIN" run -- node -e "console.log('RUN_OK')"
 run "$BE_BIN" validate --environment development
 
 expect_failure "$BE_BIN" environments create demo

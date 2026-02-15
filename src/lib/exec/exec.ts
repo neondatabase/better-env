@@ -5,7 +5,7 @@ export const exec: Exec = async (
   cmd: string[],
   options: ExecOptions,
 ): Promise<ExecResult> => {
-  const env = options.env ? mergeEnv(process.env, options.env) : undefined;
+  const env = options.env ? mergeEnv(process.env, options.env) : process.env;
   const [command, ...args] = cmd;
 
   if (!command) {
@@ -16,7 +16,7 @@ export const exec: Exec = async (
     const proc = spawn(command, args, {
       cwd: options.cwd,
       env,
-      stdio: "inherit",
+      stdio: "inherit" as const,
     });
 
     const exitCode = await waitForExit(proc);
@@ -26,7 +26,7 @@ export const exec: Exec = async (
   const proc = spawn(command, args, {
     cwd: options.cwd,
     env,
-    stdio: ["pipe", "pipe", "pipe"],
+    stdio: "pipe" as const,
   });
 
   if (proc.stdin) {
@@ -62,14 +62,8 @@ function waitForExit(proc: ReturnType<typeof spawn>): Promise<number> {
 function mergeEnv(
   base: NodeJS.ProcessEnv,
   overrides: Record<string, string>,
-): Record<string, string> {
-  const result: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(base)) {
-    if (typeof value === "string") {
-      result[key] = value;
-    }
-  }
+): NodeJS.ProcessEnv {
+  const result: NodeJS.ProcessEnv = { ...base };
 
   for (const [key, value] of Object.entries(overrides)) {
     result[key] = value;

@@ -48,29 +48,6 @@ export async function pullEnv(options: {
   return { environment, envFile: envConfig.envFile };
 }
 
-export async function runWithEnv(options: {
-  ctx: BetterEnvAdapterContext;
-  config: BetterEnvConfig;
-  environmentName?: string;
-  command: string[];
-}): Promise<{ exitCode: number }> {
-  if (options.command.length === 0) {
-    throw new Error("Missing command. Use: better-env run -- <command...>");
-  }
-
-  await pullEnv({
-    ctx: options.ctx,
-    config: options.config,
-    environmentName: options.environmentName,
-  });
-
-  const result = await options.ctx.exec(options.command, {
-    cwd: options.ctx.projectDir,
-    interactive: true,
-  });
-  return { exitCode: result.exitCode };
-}
-
 export async function addEnvVar(options: {
   ctx: BetterEnvAdapterContext;
   config: BetterEnvConfig;

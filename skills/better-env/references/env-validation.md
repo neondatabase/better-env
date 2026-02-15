@@ -15,6 +15,20 @@
 - Run in CI as a fast pre-check.
 - Run locally before `next build` to catch missing secrets early.
 
+## Missing Variable Playbook
+
+If validation reports a missing variable:
+
+1. Pull latest remote values for the same environment:
+   - `better-env pull --environment <name>`
+2. Re-run validation:
+   - `better-env validate --environment <name>`
+3. If still missing, add/update remote env:
+   - `better-env upsert <KEY> "<VALUE>" --environment <name> [--sensitive]`
+4. Pull again and re-run validation.
+
+For sensitive values (for example `DB_URL`), never print the actual value in logs or docs; only report whether validation passed.
+
 ## Example
 
 ```bash

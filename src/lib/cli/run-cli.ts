@@ -11,7 +11,6 @@ import {
   initProject,
   loadEnvFileToRemote,
   pullEnv,
-  runWithEnv,
 } from "../runtime/runtime.ts";
 import { validateEnv } from "../validate-env/validate-env.ts";
 
@@ -60,34 +59,6 @@ export async function runCli(argv: string[]): Promise<void> {
       environmentName: parsed.flags.environment,
     });
     return;
-  }
-
-  if (cmd === "dev") {
-    const devCommand = configModule.config.runtime?.devCommand;
-    if (!devCommand || devCommand.length === 0) {
-      console.error(
-        'Missing `runtime.devCommand` in better-env.ts. Example: { runtime: { devCommand: ["next", "dev"] } }',
-      );
-      process.exit(1);
-    }
-
-    const res = await runWithEnv({
-      ctx,
-      config: configModule.config,
-      environmentName: parsed.flags.environment,
-      command: devCommand,
-    });
-    process.exit(res.exitCode);
-  }
-
-  if (cmd === "run") {
-    const res = await runWithEnv({
-      ctx,
-      config: configModule.config,
-      environmentName: parsed.flags.environment,
-      command: parsed.dashDash,
-    });
-    process.exit(res.exitCode);
   }
 
   if (cmd === "add" || cmd === "upsert" || cmd === "update") {

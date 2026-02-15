@@ -2,21 +2,12 @@ import { describe, expect, it } from "bun:test";
 import { parseCliArgs } from "./argv.ts";
 
 describe("parseCliArgs", () => {
-  it("parses command, options, and -- passthrough args", () => {
-    const parsed = parseCliArgs([
-      "run",
-      "--environment",
-      "preview",
-      "--",
-      "bun",
-      "run",
-      "dev",
-    ]);
+  it("parses command and options", () => {
+    const parsed = parseCliArgs(["pull", "--environment", "preview"]);
 
-    expect(parsed.commandPath).toEqual(["run"]);
+    expect(parsed.commandPath).toEqual(["pull"]);
     expect(parsed.positionals).toEqual([]);
     expect(parsed.flags.environment).toBe("preview");
-    expect(parsed.dashDash).toEqual(["bun", "run", "dev"]);
   });
 
   it("keeps unknown flags as positionals", () => {

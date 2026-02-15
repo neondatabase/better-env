@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "better-env run -- bun run dev:next",
+    "dev": "bun run dev:next",
     "dev:next": "next dev",
     "build": "next build",
     "start": "next start",

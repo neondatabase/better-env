@@ -1,6 +1,6 @@
----
 name: better-env
-description: Operate and integrate the better-env runtime + CLI (sync local .env files from Vercel before running commands), manage remote environment variables (add/upsert/update/delete/load), configure better-env via better-env.ts, and use configSchema + env validation utilities to catch missing/invalid env vars early.
+description: Operate and integrate the better-env runtime + CLI (sync local .env files from Vercel), manage remote environment variables (add/upsert/update/delete/load), configure better-env via better-env.ts, and use configSchema + env validation utilities to catch missing/invalid env vars early.
+
 ---
 
 # better-env
@@ -8,9 +8,9 @@ description: Operate and integrate the better-env runtime + CLI (sync local .env
 ## Work With better-env In A Repo
 
 1. Find (or create) `better-env.ts` at the project root.
-2. Ensure `runtime.devCommand` is set (required for `better-env dev`).
-3. Run `better-env init` once to confirm the adapter is set up (Vercel: linked project).
-4. Use `better-env dev` or `better-env run -- <cmd...>` as the default entrypoint locally.
+2. Run `better-env init` once to confirm the adapter is set up (Vercel: linked project).
+3. Run `better-env pull` when env vars may have changed remotely.
+4. Start the app/dev server with the project's own command (for example `bun run dev`).
 
 If you need details, read:
 
@@ -27,9 +27,6 @@ import { defineBetterEnv, vercelAdapter } from "better-env";
 
 export default defineBetterEnv({
   adapter: vercelAdapter(),
-  runtime: {
-    devCommand: ["next", "dev"],
-  },
 });
 ```
 
@@ -37,9 +34,9 @@ Customize environments (env file targets + remote mapping) and gitignore behavio
 
 ## Run With Synced Env
 
-- Prefer `better-env dev` for local dev.
-- Use `better-env run -- <cmd...>` to wrap any command (migrations, scripts, etc.).
-- Use `better-env pull` to only sync env files without running a command.
+- Use `better-env pull` to sync env files.
+- Run your own commands directly (for example `bun run dev`, `bun run db:migrate`).
+- Pull again when you expect remote env changes.
 
 The runtime writes the configured env file (defaults: `.env.development`, `.env.preview`, `.env.production`) and never overwrites `.env.local`.
 
@@ -65,6 +62,27 @@ better-env validate --environment development
 ```
 
 This loads `.env*` files using Next.js semantics, imports each `src/lib/*/config.ts`, and fails fast on missing/invalid env vars. See `references/env-validation.md`.
+
+## Handle Missing Or User-Provided Env Vars
+
+When env vars are missing locally:
+
+1. Run `better-env pull --environment <name>` first.
+2. Re-run `better-env validate --environment <name>`.
+3. If still missing, create/update the remote variable with `better-env upsert`.
+4. Pull again to refresh the local env file.
+
+When a user shares a secret value directly (example: `DB_URL`):
+
+1. Treat the value as sensitive and never echo it in logs, diffs, docs, or commits.
+2. Set it remotely with sensitivity enabled:
+   - `better-env upsert DB_URL "<value>" --environment development --sensitive`
+3. Pull to local env file:
+   - `better-env pull --environment development`
+4. In app config, keep it server-only:
+   - `server({ env: "DB_URL" })` (not `pub()`).
+
+If you need to verify presence without exposing content, validate via `configSchema`/`better-env validate` and report only that the variable is set.
 
 ## Troubleshoot Quickly
 

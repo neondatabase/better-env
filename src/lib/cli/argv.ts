@@ -4,7 +4,6 @@ import type { BetterEnvLoadMode } from "../runtime/types.ts";
 type ParsedCliArgs = {
   commandPath: string[];
   positionals: string[];
-  dashDash: string[];
   flags: {
     cwd?: string;
     environment?: string;
@@ -17,12 +16,7 @@ type ParsedCliArgs = {
 };
 
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
-  const dashDashIndex = argv.indexOf("--");
-  const beforeDashDash =
-    dashDashIndex === -1 ? argv : argv.slice(0, dashDashIndex);
-  const dashDash = dashDashIndex === -1 ? [] : argv.slice(dashDashIndex + 1);
-
-  const { positionals, flags } = parseFlags(beforeDashDash);
+  const { positionals, flags } = parseFlags(argv);
 
   const cmd = positionals[0];
   const supportsSubcommand = cmd === "environments" || cmd === "envs";
@@ -36,7 +30,6 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   return {
     commandPath,
     positionals: rest,
-    dashDash,
     flags,
   };
 }

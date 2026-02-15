@@ -27,26 +27,6 @@ Example:
 better-env pull --environment preview
 ```
 
-## `better-env dev`
-
-Pull env vars (like `pull`) and then run `runtime.devCommand` from `better-env.ts`.
-
-Example:
-
-```bash
-better-env dev
-```
-
-## `better-env run -- <command...>`
-
-Pull env vars (like `pull`) and then run an arbitrary command.
-
-Example:
-
-```bash
-better-env run -- bun run db:migrate
-```
-
 ## `better-env add|upsert|update <key> <value>`
 
 Create/change a single remote env var:
@@ -63,6 +43,12 @@ Example:
 
 ```bash
 better-env upsert API_URL https://example.com --environment preview
+```
+
+Secret example:
+
+```bash
+better-env upsert DB_URL "<secret>" --environment development --sensitive
 ```
 
 ## `better-env delete <key>`
@@ -102,6 +88,24 @@ Run env validation for `src/lib/*/config.ts` configs using Next.js env loading s
 Example:
 
 ```bash
+better-env validate --environment development
+```
+
+## Common Env Workflows
+
+Missing env var locally:
+
+```bash
+better-env pull --environment development
+bun run dev
+better-env validate --environment development
+```
+
+User provided a new env var value:
+
+```bash
+better-env upsert DB_URL "<value>" --environment development --sensitive
+better-env pull --environment development
 better-env validate --environment development
 ```
 

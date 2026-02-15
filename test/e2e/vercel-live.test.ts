@@ -55,14 +55,21 @@ describe("better-env live Vercel e2e (next demo)", () => {
         ]);
         assertOk(linkProject, `vercel link --project ${projectName}`);
 
-        const projectJsonPath = path.join(testAppDir, ".vercel", "project.json");
+        const projectJsonPath = path.join(
+          testAppDir,
+          ".vercel",
+          "project.json",
+        );
         if (!fs.existsSync(projectJsonPath)) {
           throw new Error(
             `Expected linked project file at ${projectJsonPath}, but it was not found.`,
           );
         }
 
-        const verify = await runCommand(testAppDir, ["bash", "./scripts/verify-cli.sh"]);
+        const verify = await runCommand(testAppDir, [
+          "bash",
+          "./scripts/verify-cli.sh",
+        ]);
         assertOk(verify, "scripts/verify-cli.sh");
 
         if (!verify.stdout.includes("Verification complete.")) {
@@ -106,7 +113,7 @@ async function runCommand(
     env: process.env,
   });
 
-  if (options?.stdin !== undefined) {
+  if (options?.stdin !== undefined && proc.stdin) {
     proc.stdin.write(options.stdin);
     proc.stdin.end();
   }

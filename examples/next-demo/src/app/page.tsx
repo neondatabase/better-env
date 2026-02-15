@@ -1,4 +1,4 @@
-import { siteConfig } from "@/lib/site/config";
+import { siteConfig } from "../lib/site/config";
 
 export default function Home() {
   return (

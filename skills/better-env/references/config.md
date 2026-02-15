@@ -12,9 +12,6 @@ import { defineBetterEnv, vercelAdapter } from "better-env";
 
 export default defineBetterEnv({
   adapter: vercelAdapter(),
-  runtime: {
-    devCommand: ["next", "dev"],
-  },
 });
 ```
 
@@ -28,18 +25,6 @@ Vercel v1:
 
 ```ts
 adapter: vercelAdapter();
-```
-
-## `runtime.devCommand` (recommended)
-
-Command run by `better-env dev`.
-
-Example:
-
-```ts
-runtime: {
-  devCommand: ["bun", "run", "dev"];
-}
 ```
 
 ## `gitignore.ensure` (default: `true`)
