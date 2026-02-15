@@ -1,4 +1,4 @@
-import { isNonEmptyString } from "../utils/strings.ts";
+import { Command } from "commander";
 import type { BetterEnvLoadMode } from "../runtime/types.ts";
 
 type ParsedCliArgs = {
@@ -45,68 +45,68 @@ function parseFlags(argv: string[]): {
   positionals: string[];
   flags: ParsedCliArgs["flags"];
 } {
-  const positionals: string[] = [];
+  const parser = createFlagParser();
+  const parsed = parser.parseOptions(argv);
+  const opts = parser.opts<{
+    cwd?: string;
+    environment?: string;
+    yes?: boolean;
+    help?: boolean;
+    list?: boolean;
+    sensitive?: boolean;
+  }>();
 
-  let cwd: string | undefined;
-  let environment: string | undefined;
-  let yes = false;
-  let help = false;
-  let list = false;
-  let sensitive = false;
+  const positionals = [...parsed.operands, ...parsed.unknown];
+  const mode = resolveLoadMode(argv);
+
+  return {
+    positionals,
+    flags: {
+      cwd: opts.cwd,
+      environment: opts.environment,
+      yes: opts.yes ?? false,
+      help: opts.help ?? false,
+      list: opts.list ?? false,
+      sensitive: opts.sensitive ?? false,
+      mode,
+    },
+  };
+}
+
+function createFlagParser(): Command {
+  return new Command()
+    .storeOptionsAsProperties(false)
+    .helpOption(false)
+    .allowUnknownOption(true)
+    .allowExcessArguments(true)
+    .option("--cwd <path>")
+    .option("-e, --environment <name>")
+    .option("-y, --yes")
+    .option("-h, --help")
+    .option("--list")
+    .option("--sensitive")
+    .option("--mode <mode>");
+}
+
+function resolveLoadMode(argv: string[]): BetterEnvLoadMode {
   let mode: BetterEnvLoadMode = "upsert";
 
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token) continue;
 
-    if (!token.startsWith("-")) {
-      positionals.push(token);
-      continue;
-    }
-
-    if (token === "--help" || token === "-h") {
-      help = true;
-      continue;
-    }
-
-    if (token === "--yes" || token === "-y") {
-      yes = true;
-      continue;
-    }
-
-    if (token === "--list") {
-      list = true;
-      continue;
-    }
-
-    if (token === "--sensitive") {
-      sensitive = true;
-      continue;
-    }
-
-    if (token.startsWith("--cwd=")) {
-      cwd = token.slice("--cwd=".length);
-      continue;
-    }
-
-    if (token === "--cwd") {
-      const value = argv[i + 1];
-      if (isNonEmptyString(value)) {
-        cwd = value;
-        i += 1;
+    if (token.startsWith("--mode=")) {
+      const value = token.slice("--mode=".length);
+      if (isLoadMode(value)) {
+        mode = value;
       }
       continue;
     }
 
-    if (token.startsWith("--environment=")) {
-      environment = token.slice("--environment=".length);
-      continue;
-    }
-
-    if (token === "--environment" || token === "-e") {
+    if (token === "--mode") {
       const value = argv[i + 1];
-      if (isNonEmptyString(value)) {
-        environment = value;
+      if (isLoadMode(value)) {
+        mode = value;
         i += 1;
       }
       continue;
@@ -116,49 +116,27 @@ function parseFlags(argv: string[]): {
       mode = "add";
       continue;
     }
-
     if (token === "--update") {
       mode = "update";
       continue;
     }
-
     if (token === "--upsert") {
       mode = "upsert";
       continue;
     }
-
     if (token === "--replace") {
       mode = "replace";
-      continue;
     }
-
-    if (token.startsWith("--mode=")) {
-      const value = token.slice("--mode=".length);
-      if (
-        value === "add" ||
-        value === "update" ||
-        value === "upsert" ||
-        value === "replace"
-      ) {
-        mode = value;
-      }
-      continue;
-    }
-
-    // Unknown flag -> treat as positional for now so we don't block iteration.
-    positionals.push(token);
   }
 
-  return {
-    positionals,
-    flags: {
-      cwd,
-      environment,
-      yes,
-      help,
-      list,
-      sensitive,
-      mode,
-    },
-  };
+  return mode;
+}
+
+function isLoadMode(value: string | undefined): value is BetterEnvLoadMode {
+  return (
+    value === "add" ||
+    value === "update" ||
+    value === "upsert" ||
+    value === "replace"
+  );
 }
