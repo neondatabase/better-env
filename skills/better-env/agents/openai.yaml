@@ -1,0 +1,7 @@
+interface:
+  display_name: "better-env"
+  short_description: "Sync Vercel envs + validate configs"
+  default_prompt: "Use $better-env to set up and operate better-env (Vercel adapter), including runtime sync, env CRUD, and env validation."
+
+policy:
+  allow_implicit_invocation: true
