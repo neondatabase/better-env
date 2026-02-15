@@ -48,8 +48,10 @@ function coerceConfig(value: unknown): BetterEnvConfig {
 }
 
 function withDefaults(config: BetterEnvConfig): BetterEnvConfig {
+  const adapterDefaults = config.adapter.defaultEnvironments?.();
   const envs =
     config.environments ??
+    adapterDefaults ??
     ({
       development: {
         envFile: ".env.development",

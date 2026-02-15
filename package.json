@@ -11,6 +11,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./adapters/vercel": "./dist/adapters/vercel.js",
+    "./adapters/netlify": "./dist/adapters/netlify.js",
     "./config-schema": "./dist/config-schema/index.js",
     "./validate-env": "./dist/validate-env/index.js"
   },

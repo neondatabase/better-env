@@ -1,0 +1,133 @@
+#!/usr/bin/env bun
+import fs from "node:fs";
+import path from "node:path";
+
+const argv = stripGlobals(process.argv.slice(2));
+
+if (argv[0] === "--version") {
+  console.log("netlify-cli/0.0.0-test");
+  process.exit(0);
+}
+
+if (argv[0] === "link") {
+  ensureLinked();
+  process.exit(0);
+}
+
+if (argv[0] === "env:list") {
+  const context = readFlag(argv, "--context") ?? "dev";
+  const store = readStore();
+  const vars = store.env[context] ?? {};
+
+  if (argv.includes("--plain")) {
+    for (const [k, v] of Object.entries(vars).sort(([a], [b]) =>
+      a.localeCompare(b),
+    )) {
+      console.log(`${k}=${v}`);
+    }
+    process.exit(0);
+  }
+
+  console.error("Missing --plain for fake netlify env:list");
+  process.exit(1);
+}
+
+if (argv[0] === "env:set") {
+  const key = argv[1];
+  const value = argv[2];
+  const context = readFlag(argv, "--context") ?? "dev";
+  if (!key || value === undefined) {
+    console.error("Missing env:set arguments");
+    process.exit(1);
+  }
+
+  const store = readStore();
+  store.env[context] ??= {};
+  store.env[context][key] = value;
+  writeStore(store);
+  process.exit(0);
+}
+
+if (argv[0] === "env:unset") {
+  const key = argv[1];
+  const context = readFlag(argv, "--context") ?? "dev";
+  if (!key) {
+    console.error("Missing env:unset arguments");
+    process.exit(1);
+  }
+
+  const store = readStore();
+  store.env[context] ??= {};
+  const exists = Object.prototype.hasOwnProperty.call(store.env[context], key);
+  if (!exists) {
+    console.error("Not found");
+    process.exit(1);
+  }
+
+  delete store.env[context][key];
+  writeStore(store);
+  process.exit(0);
+}
+
+console.error(`Unsupported fake netlify invocation: ${argv.join(" ")}`);
+process.exit(1);
+
+function stripGlobals(args: string[]): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < args.length; i += 1) {
+    const token = args[i];
+    if (!token) continue;
+    if (token === "--auth" || token === "--filter") {
+      i += 1;
+      continue;
+    }
+    out.push(token);
+  }
+  return out;
+}
+
+function readFlag(args: string[], name: string): string | undefined {
+  const idx = args.indexOf(name);
+  if (idx === -1) return undefined;
+  const value = args[idx + 1];
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function ensureLinked(): void {
+  const dir = path.join(process.cwd(), ".netlify");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, "state.json"),
+    JSON.stringify({ siteId: "site_test" }, null, 2),
+    "utf8",
+  );
+}
+
+function storePath(): string {
+  return path.join(process.cwd(), ".better-env-test", "netlify-store.json");
+}
+
+function readStore() {
+  const p = storePath();
+  if (!fs.existsSync(p)) {
+    return { env: {} };
+  }
+  const raw = fs.readFileSync(p, "utf8");
+  const parsed = JSON.parse(raw);
+  if (!isStore(parsed)) {
+    return { env: {} };
+  }
+  return parsed;
+}
+
+function writeStore(store) {
+  const dir = path.dirname(storePath());
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(storePath(), JSON.stringify(store, null, 2), "utf8");
+}
+
+function isStore(value) {
+  if (typeof value !== "object" || value === null) return false;
+  if (!("env" in value)) return false;
+  return true;
+}

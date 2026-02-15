@@ -1,15 +1,14 @@
 # better-env
 
-`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, `validate-env` for pre-run checks, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms.
+`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms.
 
 ## Introduction
 
 Don't you hate it when your production build fails because you forgot to upload a new env var to your hosting provider? Isn't it super furstrating when your on another machine and you want to work on your app only to realize your env variables are not up to date or missing? I think we deserve a better way. Enter `better-env`.
 
 - **Config schema** for full type safety for both public and server-only env variables
-- **CLI** for managing your enviorment variables
+- **CLI** for managing and validatingyour enviorment variables
 - **Adapters** to keep local variables in sync with remote providers (Vercel, Netlify, Cloudflare, etc.)
-- **Scripts** to validate your current app enviornment against your application's config schemas
 
 ## Setup
 
@@ -56,7 +55,7 @@ This keeps ownership clear and allows validation to discover config declarations
 
 ### 3) Add and run environment validation
 
-If your project follows the `config.ts` convention, use the validation command before `dev`, `build`, or deploy steps.
+If your project follows the `config.ts` convention, you can use the `better-env validate` command to validate your current app enviornment against your application's config schemas.
 
 ```json
 {
@@ -68,15 +67,12 @@ If your project follows the `config.ts` convention, use the validation command b
 }
 ```
 
-You can invoke the CLI with either `npx better-env ...` or `bunx better-env ...`.
+## Remote Environment Management
 
-## CLI
-
-`better-env` CLI is for projects hosted on a supported remote service. In practice, this means choosing a provider such as Vercel, Netlify, or Cloudflare when a supported adapter is available. The CLI only makes sense when your app's environment variables are managed remotely by that provider.
+If you're using a supported hosting provider, you can use the `better-env` CLI to manage your remote environment variables and keep your local dotenv files in sync.
 
 ### Requirements
 
-- A supported adapter and provider workflow
 - Provider CLI available in `$PATH`
   - Vercel adapter: `vercel` (or set `vercelBin`)
   - Netlify adapter: `netlify` (or set `netlifyBin`)
@@ -118,6 +114,7 @@ By default, `better-env` provides these environment names:
 - `preview` → writes `.env.preview`, pulls from Vercel `preview`
 - `production` → writes `.env.production`, pulls from Vercel `production`
 - `test` → writes `.env.test`, local-only (no remote mapping)
+- `local` → writes `.env.local`, local-only (no remote mapping)
 
 For Netlify adapter, the same local names map to:
 
@@ -142,7 +139,7 @@ export default defineBetterEnv({
 });
 ```
 
-`better-env` never writes to `.env.local` (use it as your local override).
+Note: `better-env` never writes to `.env.local` (use it as your local override).
 
 ## CLI Command Reference
 

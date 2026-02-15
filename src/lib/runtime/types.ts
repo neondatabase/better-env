@@ -21,9 +21,9 @@ export type BetterEnvConfig = {
   adapter: BetterEnvAdapter;
   /**
    * Optional environment map. If omitted, a sensible default is used:
-   * development/preview/production map to Vercel envs and write to
-   * `.env.development`, `.env.preview`, `.env.production`. A local-only `test`
-   * env writes to `.env.test`.
+   * development/preview/production write to `.env.development`,
+   * `.env.preview`, `.env.production`. Remote names depend on the adapter.
+   * A local-only `test` env writes to `.env.test`.
    */
   environments?: Record<BetterEnvEnvironmentName, BetterEnvEnvironmentConfig>;
   gitignore?: {
@@ -37,6 +37,14 @@ export type BetterEnvConfig = {
 
 export type BetterEnvAdapter = {
   name: string;
+  /**
+   * Optional adapter-provided environment defaults used when config.environments
+   * is omitted.
+   */
+  defaultEnvironments?: () => Record<
+    BetterEnvEnvironmentName,
+    BetterEnvEnvironmentConfig
+  >;
   init: (
     ctx: BetterEnvAdapterContext,
     options: { yes: boolean },
