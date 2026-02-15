@@ -27,7 +27,7 @@ Learn more:
 
 Use runtime configuration to keep local dotenv targets aligned with provider environments while preserving safe defaults.
 
-Create `better-env.ts` with `defineBetterEnv(...)` and an adapter (`vercelAdapter`, `netlifyAdapter`, or `cloudflareAdapter`), then define environment mappings, env-file targets, and gitignore behavior.
+Create `better-env.ts` with `defineBetterEnv(...)` and an adapter (`vercelAdapter`, `netlifyAdapter`, `railwayAdapter`, or `cloudflareAdapter`), then define environment mappings, env-file targets, and gitignore behavior.
 
 Learn more:
 

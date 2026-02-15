@@ -13,6 +13,8 @@ export { netlifyAdapter } from "./lib/adapters/netlify.ts";
 export type { NetlifyAdapterOptions } from "./lib/adapters/netlify.ts";
 export { cloudflareAdapter } from "./lib/adapters/cloudflare.ts";
 export type { CloudflareAdapterOptions } from "./lib/adapters/cloudflare.ts";
+export { railwayAdapter } from "./lib/adapters/railway.ts";
+export type { RailwayAdapterOptions } from "./lib/adapters/railway.ts";
 
 export {
   configSchema,

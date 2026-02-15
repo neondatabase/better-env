@@ -1,6 +1,6 @@
 # better-env
 
-`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify and Cloudflare).
+`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway and Cloudflare).
 
 ## Introduction
 
@@ -76,6 +76,7 @@ If you're using a supported hosting provider, you can use the `better-env` CLI t
 - Provider CLI available in `$PATH`
   - Vercel adapter: `vercel` (or set `vercelBin`)
   - Netlify adapter: `netlify` (or set `netlifyBin`)
+  - Railway adapter: `railway` (or set `railwayBin`)
   - Cloudflare adapter: `wrangler` (or set `wranglerBin`)
 
 ### Configure `better-env.ts`
@@ -110,6 +111,16 @@ export default defineBetterEnv({
 });
 ```
 
+Railway example:
+
+```ts
+import { defineBetterEnv, railwayAdapter } from "better-env";
+
+export default defineBetterEnv({
+  adapter: railwayAdapter(),
+});
+```
+
 Run initial setup and first sync:
 
 ```bash
@@ -139,6 +150,13 @@ For Cloudflare adapter, the same local names map to Workers environments:
 - `development` → Wrangler `--env development`
 - `preview` → Wrangler `--env preview`
 - `production` → Wrangler default environment (no `--env` flag)
+- `test` → local-only (no remote mapping)
+
+For Railway adapter, the same local names map to Railway environments by name:
+
+- `development` → Railway `development`
+- `preview` → Railway `preview`
+- `production` → Railway `production`
 - `test` → local-only (no remote mapping)
 
 You can override (or add) environments in `better-env.ts`:
@@ -206,7 +224,13 @@ Run adapter e2e coverage:
 - Live Netlify adapter test (creates and removes a real project):
   - Requires authenticated `netlify` CLI and project create/remove permissions
   - Run with `npm run test:e2e:netlify`
+- Live Railway adapter test (creates and removes a real project):
+  - Requires authenticated `railway` CLI and project create/remove permissions
+  - Optionally set `BETTER_ENV_RAILWAY_WORKSPACE=<workspace-id>` when multiple workspaces exist
+  - Run with `npm run test:e2e:railway`
 - Netlify adapter runtime e2e test (fake CLI binary):
   - Run with `bun test test/e2e/runtime-netlify.test.ts`
+- Railway adapter runtime e2e test (fake CLI binary):
+  - Run with `npm run test:e2e:railway:runtime`
 - Cloudflare adapter runtime e2e test:
   - Run with `bun test test/e2e/runtime-cloudflare.test.ts`

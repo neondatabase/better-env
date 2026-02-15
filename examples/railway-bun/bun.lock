@@ -1,0 +1,17 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "railway-bun",
+      "dependencies": {
+        "better-env": "link:better-env",
+        "zod": "^4",
+      },
+    },
+  },
+  "packages": {
+    "better-env": ["better-env@link:better-env", { "bin": { "better-env": "./dist/cli.js" } }],
+
+    "zod": ["zod@4.3.6", "", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
+  }
+}
