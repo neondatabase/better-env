@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "next-demo",
+      "name": "vercel-next",
       "dependencies": {
         "better-env": "link:better-env",
         "next": "16.1.6",

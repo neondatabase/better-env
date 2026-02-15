@@ -1,0 +1,39 @@
+{
+  "name": "examples-netlify-react-router",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "npm run dev",
+    "typecheck": "react-router typegen && tsc",
+    "env:init": "better-env init --yes",
+    "env:pull": "better-env pull --environment development",
+    "env:validate": "better-env validate --environment development",
+    "env:list": "better-env environments list",
+    "env:verify": "./scripts/verify-cli.sh"
+  },
+  "dependencies": {
+    "@react-router/node": "^7.12.0",
+    "better-env": "link:better-env",
+    "isbot": "^5.1.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^7.12.0",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@netlify/vite-plugin": "^2.7.19",
+    "@netlify/vite-plugin-react-router": "^2.1.2",
+    "@react-router/dev": "^7.12.0",
+    "@types/node": "^20.19.27",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-tsconfig-paths": "^6.0.3"
+  }
+}

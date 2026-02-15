@@ -10,14 +10,14 @@ type CommandResult = {
 };
 
 const packageRoot = path.resolve(import.meta.dir, "..", "..");
-const demoSourceDir = path.join(packageRoot, "examples", "next-demo");
+const demoSourceDir = path.join(packageRoot, "examples", "vercel-next");
 const testAppsRoot = path.join(packageRoot, "e2e", "test-apps");
-const testAppDir = path.join(testAppsRoot, "next");
+const testAppDir = path.join(testAppsRoot, "vercel-next");
 
 const runLiveVercelE2E = process.env.BETTER_ENV_REAL_VERCEL_E2E === "1";
 const liveIt = runLiveVercelE2E ? it : it.skip;
 
-describe("better-env live Vercel e2e (next demo)", () => {
+describe("better-env live Vercel e2e (vercel next demo)", () => {
   liveIt(
     "copies the demo app, runs env command matrix against a fresh Vercel project, and cleans up",
     async () => {
@@ -170,5 +170,5 @@ async function cleanupTestApp(): Promise<void> {
 
 function createProjectName(): string {
   const nonce = Math.random().toString(36).slice(2, 8);
-  return `better-env-e2e-next-${Date.now()}-${nonce}`;
+  return `better-env-e2e-vercel-next-${Date.now()}-${nonce}`;
 }

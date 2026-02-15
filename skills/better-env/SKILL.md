@@ -1,91 +1,59 @@
 name: better-env
-description: Operate and integrate the better-env runtime + CLI (sync local .env files from Vercel), manage remote environment variables (add/upsert/update/delete/load), configure better-env via better-env.ts, and use configSchema + env validation utilities to catch missing/invalid env vars early.
-
----
-
-# better-env
+description: The better way to manage your environment variables. Best practice for environment and runtime configuration management, including remote environment synchronization and validation + documentation of the better-env toolkit.
 
 ## Work With better-env In A Repo
 
-1. Find (or create) `better-env.ts` at the project root.
-2. Run `better-env init` once to confirm the adapter is set up (Vercel: linked project).
-3. Run `better-env pull` when env vars may have changed remotely.
-4. Start the app/dev server with the project's own command (for example `bun run dev`).
+## Type-safe environment config modules
 
-If you need details, read:
+Follow this best practice to manage environment variables in TypeScript applications with full type safety and clear server/public boundaries.
 
-- `references/config.md` for the config schema and defaults
-- `references/runtime.md` for the runtime behavior and recommended workflow
-- `references/cli.md` for the full command matrix
+`better-env` exports `configSchema` to define typed env modules and recommends placing them in feature-level `config.ts` files (for example `src/lib/auth/config.ts` and `src/lib/database/config.ts`).
 
-## Configure `better-env.ts`
+Learn more:
 
-Use a default export. Minimal example (Vercel):
+- `references/config-schema.md`
 
-```ts
-import { defineBetterEnv, vercelAdapter } from "better-env";
+## Validate existence of all env variables in the current environment
 
-export default defineBetterEnv({
-  adapter: vercelAdapter(),
-});
-```
+Run env validation early so missing or invalid values fail fast before `dev`, `build`, or deploy steps.
 
-Customize environments (env file targets + remote mapping) and gitignore behavior in the config. See `references/config.md`.
+`better-env validate --environment <name>` loads `.env*` files with Next.js semantics, discovers `src/lib/*/config.ts` modules, and checks every declared variable from your `configSchema` modules.
 
-## Run With Synced Env
+Learn more:
 
-- Use `better-env pull` to sync env files.
-- Run your own commands directly (for example `bun run dev`, `bun run db:migrate`).
-- Pull again when you expect remote env changes.
+- `references/env-validation.md`
 
-The runtime writes the configured env file (defaults: `.env.development`, `.env.preview`, `.env.production`) and never overwrites `.env.local`.
+## Configure runtime syncing between local files and hosted providers
 
-## Manage Remote Env Vars
+Use runtime configuration to keep local dotenv targets aligned with provider environments while preserving safe defaults.
 
-Use a consistent, idempotent workflow:
+Create `better-env.ts` with `defineBetterEnv(...)` and an adapter (`vercelAdapter`, `netlifyAdapter`, or `cloudflareAdapter`), then define environment mappings, env-file targets, and gitignore behavior.
 
-- Prefer `better-env upsert KEY VALUE` for scripts/automation.
-- Use `better-env add` when you want failures if the key already exists.
-- Use `better-env update` when you want failures if the key does not exist.
-- Use `better-env delete KEY` to remove a key.
+Learn more:
 
-For batch updates, use `better-env load <file> --mode upsert|add|update|replace`.
+- `references/config.md`
+- `references/runtime.md`
 
-Adapter-specific details (Vercel CLI translation) live in `references/vercel-adapter.md`.
+## Use the CLI for day-to-day environment operations
 
-## Validate Env Configs
+The CLI gives a consistent workflow for initialization, sync, validation, and remote variable management, which is great for local development and CI automation.
 
-If a codebase uses the `configSchema` pattern (configs in `src/lib/*/config.ts`), run:
+Recommended flow in a repo:
 
-```bash
-better-env validate --environment development
-```
+1. Run `better-env init` once to verify adapter prerequisites.
+2. Run `better-env pull --environment <name>` to sync local env files.
+3. Run `better-env validate --environment <name>` before app startup/build.
+4. Use `add`, `upsert`, `update`, `delete`, and `load` for remote env changes.
 
-This loads `.env*` files using Next.js semantics, imports each `src/lib/*/config.ts`, and fails fast on missing/invalid env vars. See `references/env-validation.md`.
+Choose command behavior intentionally:
 
-## Handle Missing Or User-Provided Env Vars
+- `upsert` for idempotent automation and scripts
+- `add` when duplicate keys should fail
+- `update` when missing keys should fail
+- `delete` to remove remote keys
+- `load` for batch updates from dotenv files
 
-When env vars are missing locally:
+Learn more:
 
-1. Run `better-env pull --environment <name>` first.
-2. Re-run `better-env validate --environment <name>`.
-3. If still missing, create/update the remote variable with `better-env upsert`.
-4. Pull again to refresh the local env file.
-
-When a user shares a secret value directly (example: `DB_URL`):
-
-1. Treat the value as sensitive and never echo it in logs, diffs, docs, or commits.
-2. Set it remotely with sensitivity enabled:
-   - `better-env upsert DB_URL "<value>" --environment development --sensitive`
-3. Pull to local env file:
-   - `better-env pull --environment development`
-4. In app config, keep it server-only:
-   - `server({ env: "DB_URL" })` (not `pub()`).
-
-If you need to verify presence without exposing content, validate via `configSchema`/`better-env validate` and report only that the variable is set.
-
-## Troubleshoot Quickly
-
-1. If `better-env init` fails on Vercel: ensure `vercel` CLI is installed and the repo is linked (`.vercel/project.json` exists). Re-run `better-env init`.
-2. If env values look stale: run `better-env pull --environment <name>` and confirm the target env file changed.
-3. If secrets appear in git status: ensure the env file is covered by `.gitignore` (or `gitignore.ensure` is enabled). See `references/runtime.md`.
+- `references/cli.md`
+- `references/vercel-adapter.md`

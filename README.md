@@ -203,7 +203,10 @@ Run adapter e2e coverage:
 - Live Vercel adapter test (creates and removes a real project):
   - Requires authenticated `vercel` CLI and project create/remove permissions
   - Run with `npm run test:e2e:vercel`
-- Netlify adapter runtime e2e test:
+- Live Netlify adapter test (creates and removes a real project):
+  - Requires authenticated `netlify` CLI and project create/remove permissions
+  - Run with `npm run test:e2e:netlify`
+- Netlify adapter runtime e2e test (fake CLI binary):
   - Run with `bun test test/e2e/runtime-netlify.test.ts`
 - Cloudflare adapter runtime e2e test:
   - Run with `bun test test/e2e/runtime-cloudflare.test.ts`
