@@ -1,120 +1,29 @@
 # better-env
 
-`better-env` is a bun-first runtime + CLI for keeping local `.env*` files in sync with a remote provider (v1: Vercel), plus the env utilities from `fullstackrecipes` (config schema + env validation).
+`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, `validate-env` for pre-run checks, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms.
 
-## What You Get (v1)
+## Introduction
 
-- `better-env pull`: pull latest env vars and ensure gitignore coverage
-- `better-env init`: verify `vercel` is installed and the project is linked (`.vercel/project.json`)
-- `better-env add|upsert|update|delete`: manage remote env vars
-- `better-env load <file> --mode upsert|add|update|replace`: apply a dotenv file to remote env vars
-- `better-env validate`: pre-run env validation for Next.js-style projects (imports `src/lib/*/config.ts`)
-- `configSchema` utility: a typed env-schema helper (`server()` / `pub()` / flags / `oneOf`)
+Don't you hate it when your production build fails because you forgot to upload a new env var to your hosting provider? Isn't it super furstrating when your on another machine and you want to work on your app only to realize your env variables are not up to date or missing? I think we deserve a better way. Enter `better-env`.
 
-## Requirements
-
-- `bun`
-- Vercel adapter only: `vercel` CLI available in `$PATH` (or set `vercelBin` in config)
+- **Config schema** for full type safety for both public and server-only env variables
+- **CLI** for managing your enviorment variables
+- **Adapters** to keep local variables in sync with remote providers (Vercel, Netlify, Cloudflare, etc.)
+- **Scripts** to validate your current app enviornment against your application's config schemas
 
 ## Setup
 
-Create `better-env.ts` in your project root:
+### 1) Install the coding agent skill
 
-```ts
-import { defineBetterEnv, vercelAdapter } from "better-env";
-
-export default defineBetterEnv({
-  adapter: vercelAdapter(),
-});
-```
-
-Then:
-
-```bash
-better-env init
-better-env pull --environment development
-bun run dev
-```
-
-## Environments
-
-By default, `better-env` provides these environment names:
-
-- `development` → writes `.env.development`, pulls from Vercel `development`
-- `preview` → writes `.env.preview`, pulls from Vercel `preview`
-- `production` → writes `.env.production`, pulls from Vercel `production`
-- `test` → writes `.env.test`, local-only (no remote mapping)
-
-You can override (or add) environments in `better-env.ts`:
-
-```ts
-import { defineBetterEnv, vercelAdapter } from "better-env";
-
-export default defineBetterEnv({
-  adapter: vercelAdapter(),
-  environments: {
-    development: { envFile: ".env.development", remote: "development" },
-    preview: { envFile: ".env.preview", remote: "preview" },
-    production: { envFile: ".env.production", remote: "production" },
-    test: { envFile: ".env.test", remote: null },
-  },
-});
-```
-
-`better-env` never writes to `.env.local` (use it as your local override).
-
-## Commands
-
-```bash
-better-env init [--yes]
-better-env pull [--environment <name>]
-better-env validate [--environment <name>]
-
-better-env add <key> <value> [--environment <name>] [--sensitive]
-better-env upsert <key> <value> [--environment <name>] [--sensitive]
-better-env update <key> <value> [--environment <name>] [--sensitive]
-better-env delete <key> [--environment <name>]
-
-better-env load <file> [--environment <name>] [--mode add|update|upsert|replace] [--sensitive]
-better-env environments list
-```
-
-## Skills (For Coding Agents)
-
-Install the `better-env` Codex/Cursor skill from this repo:
+Install the `better-env` skill first so coding agents can apply the recommended conventions and workflows:
 
 ```bash
 npx skills add neondatabase/better-env
-# or (recommended, explicit):
-npx skills add neondatabase/better-env --skill better-env -a codex -a cursor
 ```
 
-## Env Validation (from fullstackrecipes)
+### 2) Add typed config modules for environment variables
 
-If your app uses the `configSchema` pattern (configs in `src/lib/*/config.ts`), you can validate env vars pre-build:
-
-```bash
-better-env validate --environment development
-```
-
-## Live Vercel E2E Test
-
-This repo includes a live Bun e2e test that copies `examples/next-demo` into
-`e2e/test-apps/next`, creates a fresh Vercel project, runs the env command
-matrix, and then removes both the test app copy and the Vercel project.
-
-Prerequisites:
-
-- `vercel` CLI authenticated
-- access to create/remove projects in your Vercel scope
-
-Run:
-
-```bash
-npm run test:e2e:vercel
-```
-
-## Config Schema Utility (from fullstackrecipes)
+Use `better-env/config-schema` to define typed config objects. This gives runtime validation and typed access for both server and public values.
 
 ```ts
 import { configSchema, server, pub } from "better-env/config-schema";
@@ -136,3 +45,142 @@ export const sentryConfig = configSchema(
   },
 );
 ```
+
+Best practice: keep one `config.ts` per feature or infrastructure service.
+
+- `src/lib/auth/config.ts`
+- `src/lib/database/config.ts`
+- `src/lib/sentry/config.ts`
+
+This keeps ownership clear and allows validation to discover config declarations consistently.
+
+### 3) Add and run environment validation
+
+If your project follows the `config.ts` convention, use the validation command before `dev`, `build`, or deploy steps.
+
+```json
+{
+  "scripts": {
+    "env:validate": "better-env validate --environment development",
+    "dev": "npm run env:validate && next dev",
+    "build": "better-env validate --environment production && next build"
+  }
+}
+```
+
+You can invoke the CLI with either `npx better-env ...` or `bunx better-env ...`.
+
+## CLI
+
+`better-env` CLI is for projects hosted on a supported remote service. In practice, this means choosing a provider such as Vercel, Netlify, or Cloudflare when a supported adapter is available. The CLI only makes sense when your app's environment variables are managed remotely by that provider.
+
+### Requirements
+
+- A supported adapter and provider workflow
+- Provider CLI available in `$PATH`
+  - Vercel adapter: `vercel` (or set `vercelBin`)
+  - Netlify adapter: `netlify` (or set `netlifyBin`)
+
+### Configure `better-env.ts`
+
+Create `better-env.ts` in your project root:
+
+```ts
+import { defineBetterEnv, vercelAdapter } from "better-env";
+
+export default defineBetterEnv({
+  adapter: vercelAdapter(),
+});
+```
+
+Netlify example:
+
+```ts
+import { defineBetterEnv, netlifyAdapter } from "better-env";
+
+export default defineBetterEnv({
+  adapter: netlifyAdapter(),
+});
+```
+
+Run initial setup and first sync:
+
+```bash
+npx better-env init
+npx better-env pull --environment development
+```
+
+## Environments
+
+By default, `better-env` provides these environment names:
+
+- `development` → writes `.env.development`, pulls from Vercel `development`
+- `preview` → writes `.env.preview`, pulls from Vercel `preview`
+- `production` → writes `.env.production`, pulls from Vercel `production`
+- `test` → writes `.env.test`, local-only (no remote mapping)
+
+For Netlify adapter, the same local names map to:
+
+- `development` → Netlify `dev`
+- `preview` → Netlify `deploy-preview`
+- `production` → Netlify `production`
+- `test` → local-only (no remote mapping)
+
+You can override (or add) environments in `better-env.ts`:
+
+```ts
+import { defineBetterEnv, vercelAdapter } from "better-env";
+
+export default defineBetterEnv({
+  adapter: vercelAdapter(),
+  environments: {
+    development: { envFile: ".env.development", remote: "development" },
+    preview: { envFile: ".env.preview", remote: "preview" },
+    production: { envFile: ".env.production", remote: "production" },
+    test: { envFile: ".env.test", remote: null },
+  },
+});
+```
+
+`better-env` never writes to `.env.local` (use it as your local override).
+
+## CLI Command Reference
+
+- `init`: validates provider CLI availability and verifies project linkage (`.vercel/project.json` or `.netlify/state.json`)
+- `pull`: fetches remote variables and ensures local `.gitignore` coverage
+- `validate`: validates required variables by loading `config.ts` modules
+- `add|upsert|update|delete`: applies single-variable mutations to the remote provider
+- `load`: applies dotenv file contents using `add|update|upsert|replace` modes
+- `environments list`: prints configured local/remote environment mappings
+
+```bash
+better-env init [--yes]
+better-env pull [--environment <name>]
+better-env validate [--environment <name>]
+
+better-env add <key> <value> [--environment <name>] [--sensitive]
+better-env upsert <key> <value> [--environment <name>] [--sensitive]
+better-env update <key> <value> [--environment <name>] [--sensitive]
+better-env delete <key> [--environment <name>]
+
+better-env load <file> [--environment <name>] [--mode add|update|upsert|replace] [--sensitive]
+better-env environments list
+```
+
+## Contribution
+
+Run local checks:
+
+```bash
+npm run build
+npm run typecheck
+npm test
+```
+
+Run adapter e2e coverage:
+
+- Live Vercel adapter test (creates and removes a real project):
+  - Requires authenticated `vercel` CLI and project create/remove permissions
+  - Run with `npm run test:e2e:vercel`
+- Netlify adapter runtime e2e test:
+  - Run with `bun test test/e2e/runtime-netlify.test.ts`
