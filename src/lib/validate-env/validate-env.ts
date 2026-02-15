@@ -1,5 +1,5 @@
-import { loadEnvConfig } from "@next/env";
-import { Glob } from "bun";
+import nextEnv from "@next/env";
+import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import type { ValidateEnvOptions } from "./types.ts";
@@ -27,7 +27,7 @@ export async function validateEnv(
   console.log(dim("  Loading environment files..."));
 
   const loadedEnvFiles: string[] = [];
-  const { loadedEnvFiles: files } = loadEnvConfig(projectDir, isDev);
+  const { loadedEnvFiles: files } = nextEnv.loadEnvConfig(projectDir, isDev);
 
   for (const file of files) {
     loadedEnvFiles.push(file.path);
@@ -45,12 +45,7 @@ export async function validateEnv(
   trackEnvAccess(referencedEnvVars);
 
   // Find all config.ts files in src/lib/*/
-  const configGlob = new Glob("src/lib/*/config.ts");
-  const configFiles: string[] = [];
-
-  for await (const file of configGlob.scan(projectDir)) {
-    configFiles.push(file);
-  }
+  const configFiles = await findConfigFiles(projectDir);
 
   if (configFiles.length === 0) {
     console.log(yellow("  ⚠ No config.ts files found in src/lib/*/\n"));
@@ -154,7 +149,7 @@ async function findUnusedEnvVars(options: {
 
   for (const envFile of options.loadedEnvFiles) {
     try {
-      const content = await Bun.file(envFile).text();
+      const content = await readFile(envFile, "utf8");
       const lines = content.split("\n");
 
       for (const line of lines) {
@@ -226,7 +221,7 @@ async function findUnusedEnvVars(options: {
     const definingFiles: string[] = [];
     for (const envFile of options.loadedEnvFiles) {
       try {
-        const content = await Bun.file(envFile).text();
+        const content = await readFile(envFile, "utf8");
         if (new RegExp(`^${envVar}\\s*=`, "m").test(content)) {
           definingFiles.push(path.relative(options.projectDir, envFile));
         }
@@ -241,4 +236,32 @@ async function findUnusedEnvVars(options: {
   }
 
   return unused.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function findConfigFiles(projectDir: string): Promise<string[]> {
+  const configFiles: string[] = [];
+  const libDir = path.join(projectDir, "src/lib");
+
+  let entries: Array<{ name: string; isDirectory(): boolean }>;
+  try {
+    entries = (await readdir(libDir, {
+      withFileTypes: true,
+    })) as Array<{ name: string; isDirectory(): boolean }>;
+  } catch {
+    return configFiles;
+  }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const absoluteConfigPath = path.join(libDir, entry.name, "config.ts");
+    try {
+      await access(absoluteConfigPath);
+      configFiles.push(path.join("src/lib", entry.name, "config.ts"));
+    } catch {
+      // ignore
+    }
+  }
+
+  return configFiles.sort();
 }

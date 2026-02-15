@@ -13,5 +13,4 @@ export default {
   sourcemap: true,
   splitting: false,
   treeshake: true,
-  external: ["bun"],
 };

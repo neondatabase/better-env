@@ -14,6 +14,7 @@ export function parseDotenv(content: string): Record<string, string> {
     if (!match) continue;
 
     const key = match[1];
+    if (!key) continue;
     const rawValue = (match[2] ?? "").trim();
     result[key] = normalizeValue(rawValue);
   }
