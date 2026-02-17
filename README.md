@@ -26,6 +26,30 @@ npx skills add neondatabase/better-env
 
 Use `better-env/config-schema` to define typed config objects. This gives runtime validation and typed access for both server and public values.
 
+Example for managing a database connection string:
+
+```ts
+import { configSchema, server } from "better-env/config-schema";
+
+export const databaseConfig = configSchema("Database", {
+  databaseUrl: server({ env: "DATABASE_URL" }),
+});
+```
+
+```ts
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { databaseConfig } from "@/lib/database/config";
+
+const pool = new Pool({
+  connectionString: databaseConfig.databaseUrl,
+});
+
+export const db = drizzle({ client: pool });
+```
+
+Example with feature flags and public environment variables:
+
 ```ts
 import { configSchema, server, pub } from "better-env/config-schema";
 
