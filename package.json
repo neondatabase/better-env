@@ -6,7 +6,7 @@
   "private": false,
   "license": "Apache-2.0",
   "bin": {
-    "better-env": "./dist/cli.js"
+    "better-env": "dist/cli.js"
   },
   "exports": {
     ".": "./dist/index.js",
