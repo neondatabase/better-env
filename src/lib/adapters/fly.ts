@@ -41,7 +41,9 @@ export function flyAdapter(options: FlyAdapterOptions = {}): BetterEnvAdapter {
   async function listKeys(ctx: BetterEnvAdapterContext): Promise<string[]> {
     const res = await run(ctx, ["secrets", "list", "--json"]);
     if (res.exitCode !== 0) {
-      throw new Error(`Failed to list env vars from Fly.\n${res.stderr}`.trim());
+      throw new Error(
+        `Failed to list env vars from Fly.\n${res.stderr}`.trim(),
+      );
     }
 
     const parsed = tryParseFlySecretsList(res.stdout);
@@ -84,7 +86,7 @@ export function flyAdapter(options: FlyAdapterOptions = {}): BetterEnvAdapter {
           [
             "Fly adapter requires an app name.",
             "Set `app` in `flyAdapter({ app: ... })`, set `BETTER_ENV_FLY_APP`,",
-            "or add `app = \"your-app-name\"` to fly.toml.",
+            'or add `app = "your-app-name"` to fly.toml.',
           ].join("\n"),
         );
       }
@@ -107,7 +109,10 @@ export function flyAdapter(options: FlyAdapterOptions = {}): BetterEnvAdapter {
       );
     },
 
-    async add(ctx, { environment: _environment, key, value, sensitive: _sensitive }) {
+    async add(
+      ctx,
+      { environment: _environment, key, value, sensitive: _sensitive },
+    ) {
       const exists = await envVarExists(ctx, listKeys, { key });
       if (exists) {
         throw new Error(
@@ -127,9 +132,16 @@ export function flyAdapter(options: FlyAdapterOptions = {}): BetterEnvAdapter {
       ctx,
       { environment: _environment, key, value, sensitive: _sensitive },
     ) {
-      const res = await run(ctx, ["secrets", "set", `${key}=${value}`, "--stage"]);
+      const res = await run(ctx, [
+        "secrets",
+        "set",
+        `${key}=${value}`,
+        "--stage",
+      ]);
       if (res.exitCode !== 0) {
-        throw new Error(`Failed to upsert env var ${key}.\n${res.stderr}`.trim());
+        throw new Error(
+          `Failed to upsert env var ${key}.\n${res.stderr}`.trim(),
+        );
       }
     },
 
@@ -155,7 +167,9 @@ export function flyAdapter(options: FlyAdapterOptions = {}): BetterEnvAdapter {
     async delete(ctx, { environment: _environment, key }) {
       const res = await run(ctx, ["secrets", "unset", key, "--stage"]);
       if (res.exitCode !== 0) {
-        throw new Error(`Failed to delete env var ${key}.\n${res.stderr}`.trim());
+        throw new Error(
+          `Failed to delete env var ${key}.\n${res.stderr}`.trim(),
+        );
       }
     },
 

@@ -38,7 +38,11 @@ describe("better-env live Railway e2e (bun demo)", () => {
   liveIt(
     "copies the demo app, runs env command matrix against a fresh Railway project, and cleans up",
     async () => {
-      const whoami = await runCommand(packageRoot, ["railway", "whoami", "--json"]);
+      const whoami = await runCommand(packageRoot, [
+        "railway",
+        "whoami",
+        "--json",
+      ]);
       assertOk(whoami, "railway whoami --json");
 
       const workspaceId = resolveWorkspaceId(whoami);

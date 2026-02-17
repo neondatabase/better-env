@@ -20,9 +20,9 @@ describe("better-env runtime with Railway adapter (e2e)", () => {
 
     const init = await runCli(projectDir, ["init"]);
     expect(init.exitCode).toBe(0);
-    expect(fs.existsSync(path.join(projectDir, ".railway", "config.json"))).toBe(
-      true,
-    );
+    expect(
+      fs.existsSync(path.join(projectDir, ".railway", "config.json")),
+    ).toBe(true);
 
     const upsert = await runCli(projectDir, [
       "upsert",

@@ -47,7 +47,10 @@ if (argv[0] === "secret" && argv[1] === "delete") {
 
   const store = readStore();
   store.env[environment] ??= {};
-  const exists = Object.prototype.hasOwnProperty.call(store.env[environment], key);
+  const exists = Object.prototype.hasOwnProperty.call(
+    store.env[environment],
+    key,
+  );
   if (!exists) {
     console.error("Not found");
     process.exit(1);

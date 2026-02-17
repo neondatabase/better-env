@@ -37,7 +37,12 @@ describe("better-env live Fly e2e (node demo)", () => {
       let createdApp = false;
 
       try {
-        const createApp = await runCommand(packageRoot, ["fly", "apps", "create", appName]);
+        const createApp = await runCommand(packageRoot, [
+          "fly",
+          "apps",
+          "create",
+          appName,
+        ]);
         assertOk(createApp, `fly apps create ${appName}`);
         createdApp = true;
 

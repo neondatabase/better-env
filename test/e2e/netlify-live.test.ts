@@ -19,7 +19,11 @@ type NetlifySite = {
 };
 
 const packageRoot = path.resolve(import.meta.dir, "..", "..");
-const demoSourceDir = path.join(packageRoot, "examples", "netlify-react-router");
+const demoSourceDir = path.join(
+  packageRoot,
+  "examples",
+  "netlify-react-router",
+);
 const testAppsRoot = path.join(packageRoot, "e2e", "test-apps");
 const testAppDir = path.join(testAppsRoot, "netlify-react-router");
 
@@ -30,7 +34,11 @@ describe("better-env live Netlify e2e (react-router demo)", () => {
   liveIt(
     "copies the demo app, runs env command matrix against a fresh Netlify project, and cleans up",
     async () => {
-      const whoami = await runCommand(packageRoot, ["netlify", "api", "getCurrentUser"]);
+      const whoami = await runCommand(packageRoot, [
+        "netlify",
+        "api",
+        "getCurrentUser",
+      ]);
       assertOk(whoami, "netlify api getCurrentUser");
 
       await cleanupTestApp();
