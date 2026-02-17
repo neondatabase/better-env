@@ -1,10 +1,19 @@
 {
   "name": "better-env",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Runtime + CLI to sync local .env files with remote providers and validate env configs.",
+  "author": "Andre Landgraf <andre@neon.tech>",
   "type": "module",
   "private": false,
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neondatabase/better-env.git"
+  },
+  "homepage": "https://github.com/neondatabase/better-env#readme",
+  "bugs": {
+    "url": "https://github.com/neondatabase/better-env/issues"
+  },
   "bin": {
     "better-env": "dist/cli.js"
   },
