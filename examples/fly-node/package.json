@@ -1,0 +1,19 @@
+{
+  "name": "fly-node",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "env:init": "better-env init --yes",
+    "env:pull": "better-env pull --environment development",
+    "env:validate": "better-env validate --environment development",
+    "env:list": "better-env environments list",
+    "env:verify": "./scripts/verify-cli.sh"
+  },
+  "dependencies": {
+    "better-env": "link:better-env",
+    "zod": "^4"
+  }
+}

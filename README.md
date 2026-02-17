@@ -10,7 +10,7 @@ Don't you hate it when your production build fails because you forgot to upload 
 
 - `config-schema` for typed env declarations
 - a CLI for remote variable operations
-- provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway and Cloudflare)
+- provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway, Cloudflare, and Fly.io)
 
 ## Setup
 
@@ -80,6 +80,7 @@ If you're using a supported hosting provider, you can use the `better-env` CLI t
   - Netlify adapter: `netlify` (or set `netlifyBin`)
   - Railway adapter: `railway` (or set `railwayBin`)
   - Cloudflare adapter: `wrangler` (or set `wranglerBin`)
+  - Fly adapter: `fly` (or set `flyBin`)
 
 ### Configure `better-env.ts`
 
@@ -123,6 +124,18 @@ export default defineBetterEnv({
 });
 ```
 
+Fly.io example:
+
+```ts
+import { defineBetterEnv, flyAdapter } from "better-env";
+
+export default defineBetterEnv({
+  adapter: flyAdapter({
+    app: process.env.BETTER_ENV_FLY_APP,
+  }),
+});
+```
+
 Run initial setup and first sync:
 
 ```bash
@@ -161,6 +174,13 @@ For Railway adapter, the same local names map to Railway environments by name:
 - `production` → Railway `production`
 - `test` → local-only (no remote mapping)
 
+For Fly adapter, local names map to one Fly app secret store:
+
+- `development` → Fly app secrets (single remote target)
+- `preview` → Fly app secrets (single remote target)
+- `production` → Fly app secrets (single remote target)
+- `test` → local-only (no remote mapping)
+
 You can override (or add) environments in `better-env.ts`:
 
 ```ts
@@ -184,6 +204,12 @@ Notes: `better-env` never writes to `.env.local` (use it as your local override)
 - `better-env pull` is not supported for Cloudflare secrets (Wrangler cannot read back secret values).
 - `wrangler dev` (local mode) does not inject remote secrets into local dotenv files so it's on you to keep your local env vars in sync with the remote environment. Or run `wrangler dev --remote` to use deployed environment bindings at runtime.
 - Recommended workflow: keep local files (`.env.*` / `.dev.vars`) as source of truth, then push with `better-env load`.
+
+### Fly + better-env
+
+- `better-env pull` is not supported for Fly secrets (`fly secrets list` does not expose secret values).
+- Set `BETTER_ENV_FLY_APP` or configure `flyAdapter({ app: "your-app-name" })`, unless your `fly.toml` already defines `app = "..."`
+- Fly currently has one secret store per app, so `development`, `preview`, and `production` all target the same remote secret set by default.
 
 ## CLI Command Reference
 
@@ -230,9 +256,14 @@ Run adapter e2e coverage:
   - Requires authenticated `railway` CLI and project create/remove permissions
   - Optionally set `BETTER_ENV_RAILWAY_WORKSPACE=<workspace-id>` when multiple workspaces exist
   - Run with `npm run test:e2e:railway`
+- Live Fly adapter test (creates and removes a real app):
+  - Requires authenticated `fly` CLI and app create/remove permissions
+  - Run with `npm run test:e2e:fly`
 - Netlify adapter runtime e2e test (fake CLI binary):
   - Run with `bun test test/e2e/runtime-netlify.test.ts`
 - Railway adapter runtime e2e test (fake CLI binary):
   - Run with `npm run test:e2e:railway:runtime`
 - Cloudflare adapter runtime e2e test:
   - Run with `bun test test/e2e/runtime-cloudflare.test.ts`
+- Fly adapter runtime e2e test:
+  - Run with `npm run test:e2e:fly:runtime`

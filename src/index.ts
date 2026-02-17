@@ -15,6 +15,8 @@ export { cloudflareAdapter } from "./lib/adapters/cloudflare.ts";
 export type { CloudflareAdapterOptions } from "./lib/adapters/cloudflare.ts";
 export { railwayAdapter } from "./lib/adapters/railway.ts";
 export type { RailwayAdapterOptions } from "./lib/adapters/railway.ts";
+export { flyAdapter } from "./lib/adapters/fly.ts";
+export type { FlyAdapterOptions } from "./lib/adapters/fly.ts";
 
 export {
   configSchema,

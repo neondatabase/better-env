@@ -6,6 +6,7 @@ export default {
     "adapters/netlify": "src/lib/adapters/netlify.ts",
     "adapters/cloudflare": "src/lib/adapters/cloudflare.ts",
     "adapters/railway": "src/lib/adapters/railway.ts",
+    "adapters/fly": "src/lib/adapters/fly.ts",
     "config-schema/index": "src/lib/config-schema/index.ts",
     "validate-env/index": "src/lib/validate-env/index.ts",
   },
