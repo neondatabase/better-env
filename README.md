@@ -1,14 +1,16 @@
 # better-env
 
-`better-env` is a toolkit for environment and runtime configuration management, including `config-schema` for typed env declarations, a CLI for remote variable operations, and provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway and Cloudflare).
+Better environment variable management for agents and humans with full type safety, CLI-based remote environment synchronization and validation.
 
 ## Introduction
 
 Don't you hate it when your production build fails because you forgot to upload a new env var to your hosting provider? Isn't it super furstrating when your on another machine and you want to work on your app only to realize your env variables are not up to date or missing? I think we deserve a better way. Enter `better-env`.
 
-- **Config schema** for full type safety for both public and server-only env variables
-- **CLI** for managing and validatingyour enviorment variables
-- **Adapters** to keep local variables in sync with remote providers (Vercel, Netlify, Cloudflare, etc.)
+`better-env` is a toolkit for environment and runtime configuration management, including:
+
+- `config-schema` for typed env declarations
+- a CLI for remote variable operations
+- provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway and Cloudflare)
 
 ## Setup
 
