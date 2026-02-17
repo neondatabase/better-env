@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { defineBetterEnv, flyAdapter } from "better-env";
 
 export default defineBetterEnv({

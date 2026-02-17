@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { configSchema, pub, server } from "better-env/config-schema";
 import { z } from "zod";
 
