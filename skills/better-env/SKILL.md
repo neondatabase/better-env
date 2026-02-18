@@ -1,5 +1,7 @@
+---
 name: better-env
-description: The better way to manage your environment variables. Best practice for environment and runtime configuration management, including remote environment synchronization and validation + documentation of the better-env toolkit.
+description: Better environment variable management for agents and humans with full type safety, CLI-based remote environment synchronization, and environment validation. Use when setting up typed config schemas, validating env variables, or managing remote env vars across Vercel, Netlify, Railway, Cloudflare, and Fly.io with better-env.
+---
 
 ## Work With better-env In A Repo
 
