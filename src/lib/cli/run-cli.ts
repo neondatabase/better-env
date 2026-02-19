@@ -5,6 +5,7 @@ import {
   loadBetterEnvConfig,
   resolveProjectDir,
 } from "../runtime/load-config.ts";
+import { loadOrCreateConfigForInit } from "./init-config.ts";
 import {
   addEnvVar,
   deleteEnvVar,
@@ -38,19 +39,23 @@ export async function runCli(argv: string[]): Promise<void> {
     process.exit(res.exitCode);
   }
 
-  const configModule = await loadBetterEnvConfig({ cwd });
-  const projectDir = resolveProjectDir(configModule);
-
-  const ctx = { projectDir, exec };
-
   if (cmd === "init") {
+    const initConfig = await loadOrCreateConfigForInit({
+      cwd,
+      yes: parsed.flags.yes,
+    });
+    const ctx = { projectDir: initConfig.projectDir, exec };
     await initProject({
       ctx,
-      config: configModule.config,
+      config: initConfig.config,
       yes: parsed.flags.yes,
     });
     return;
   }
+
+  const configModule = await loadBetterEnvConfig({ cwd });
+  const projectDir = resolveProjectDir(configModule);
+  const ctx = { projectDir, exec };
 
   if (cmd === "pull") {
     await pullEnv({

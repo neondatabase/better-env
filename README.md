@@ -118,6 +118,16 @@ export default defineBetterEnv({
 });
 ```
 
+Or let the CLI generate it for you:
+
+```bash
+npx better-env init
+```
+
+- If `better-env.ts` is missing, `init` now opens a provider selection prompt.
+- It pre-selects based on project markers (`.vercel`, `.netlify`, `.railway`, `wrangler.toml`/`.wrangler`, `fly.toml`).
+- `npx better-env init --yes` skips prompts and uses the inferred provider (fallback: Vercel).
+
 Netlify example:
 
 ```ts
@@ -237,7 +247,7 @@ Notes: `better-env` never writes to `.env.local` (use it as your local override)
 
 ## CLI Command Reference
 
-- `init`: validates provider CLI availability and verifies project linkage when required (`.vercel/project.json` or `.netlify/state.json`)
+- `init`: creates `better-env.ts` when missing (prompt or `--yes`), then validates provider CLI availability and verifies project linkage when required (`.vercel/project.json` or `.netlify/state.json`)
 - `pull`: fetches remote variables and ensures local `.gitignore` coverage
 - `validate`: validates required variables by loading `config.ts` modules
 - `add|upsert|update|delete`: applies single-variable mutations to the remote provider

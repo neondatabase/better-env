@@ -14,6 +14,23 @@ beforeAll(async () => {
 });
 
 describe("better-env runtime (e2e)", () => {
+  it("init -y creates better-env.ts using inferred provider", async () => {
+    const projectDir = await makeTempProject();
+    await fs.promises.mkdir(path.join(projectDir, ".vercel"), {
+      recursive: true,
+    });
+
+    const init = await runCli(projectDir, ["init", "--yes"]);
+    expect(init.exitCode).toBe(0);
+
+    const configText = await fs.promises.readFile(
+      path.join(projectDir, "better-env.ts"),
+      "utf8",
+    );
+    expect(configText).toContain("vercelAdapter");
+    expect(configText).toContain('from "better-env"');
+  });
+
   it("init links project, upserts, pulls, and ensures gitignore", async () => {
     const projectDir = await makeTempProject();
     await writeConfig(projectDir);
@@ -127,8 +144,17 @@ async function runCli(
   projectDir: string,
   args: string[],
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const pathEntries = process.env.PATH?.split(path.delimiter) ?? [];
+  const envPath = [path.join(packageRoot, "test", "bin"), ...pathEntries].join(
+    path.delimiter,
+  );
+
   const proc = Bun.spawn(["bun", cliPath, ...args], {
     cwd: projectDir,
+    env: {
+      ...process.env,
+      PATH: envPath,
+    },
     stdout: "pipe",
     stderr: "pipe",
   });
