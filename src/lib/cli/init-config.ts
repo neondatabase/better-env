@@ -12,8 +12,15 @@ import { netlifyAdapter } from "../adapters/netlify.ts";
 import { railwayAdapter } from "../adapters/railway.ts";
 import { cloudflareAdapter } from "../adapters/cloudflare.ts";
 import { flyAdapter } from "../adapters/fly.ts";
+import { convexAdapter } from "../adapters/convex.ts";
 
-type AdapterChoice = "vercel" | "netlify" | "railway" | "cloudflare" | "fly";
+type AdapterChoice =
+  | "vercel"
+  | "netlify"
+  | "railway"
+  | "cloudflare"
+  | "fly"
+  | "convex";
 
 const ADAPTERS: ReadonlyArray<{
   id: AdapterChoice;
@@ -23,7 +30,8 @@ const ADAPTERS: ReadonlyArray<{
     | "netlifyAdapter"
     | "railwayAdapter"
     | "cloudflareAdapter"
-    | "flyAdapter";
+    | "flyAdapter"
+    | "convexAdapter";
 }> = [
   { id: "vercel", label: "Vercel", importName: "vercelAdapter" },
   { id: "netlify", label: "Netlify", importName: "netlifyAdapter" },
@@ -34,6 +42,7 @@ const ADAPTERS: ReadonlyArray<{
     importName: "cloudflareAdapter",
   },
   { id: "fly", label: "Fly.io", importName: "flyAdapter" },
+  { id: "convex", label: "Convex", importName: "convexAdapter" },
 ];
 
 const NO_CONFIG_ERROR = "No better-env.ts found";
@@ -156,6 +165,7 @@ function inferAdapterFromProject(
     { adapter: "railway", markers: [".railway"] },
     { adapter: "cloudflare", markers: [".wrangler", "wrangler.toml"] },
     { adapter: "fly", markers: ["fly.toml"] },
+    { adapter: "convex", markers: ["convex", "convex.json"] },
   ];
 
   for (const check of checks) {
@@ -210,5 +220,8 @@ function createConfigForAdapter(adapter: AdapterChoice): BetterEnvConfig {
   if (adapter === "cloudflare") {
     return { adapter: cloudflareAdapter() };
   }
-  return { adapter: flyAdapter() };
+  if (adapter === "fly") {
+    return { adapter: flyAdapter() };
+  }
+  return { adapter: convexAdapter() };
 }

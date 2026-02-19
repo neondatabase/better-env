@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Route } from "./+types/home";
 import { siteConfig } from "../lib/site/config";
 

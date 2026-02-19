@@ -31,6 +31,23 @@ describe("better-env runtime (e2e)", () => {
     expect(configText).toContain('from "better-env"');
   });
 
+  it("init -y infers Convex when convex markers are present", async () => {
+    const projectDir = await makeTempProject();
+    await fs.promises.mkdir(path.join(projectDir, "convex"), {
+      recursive: true,
+    });
+
+    const init = await runCli(projectDir, ["init", "--yes"]);
+    expect(init.exitCode).toBe(0);
+
+    const configText = await fs.promises.readFile(
+      path.join(projectDir, "better-env.ts"),
+      "utf8",
+    );
+    expect(configText).toContain("convexAdapter");
+    expect(configText).toContain('from "better-env"');
+  });
+
   it("init links project, upserts, pulls, and ensures gitignore", async () => {
     const projectDir = await makeTempProject();
     await writeConfig(projectDir);

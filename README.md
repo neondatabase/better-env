@@ -10,7 +10,7 @@ Don't you hate it when your production build fails because you forgot to upload 
 
 - `config-schema` for typed env declarations
 - a CLI for remote variable operations
-- provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway, Cloudflare, and Fly.io)
+- provider adapters to sync local dotenv files with hosted platforms (Vercel, Netlify, Railway, Cloudflare, Fly.io, and Convex)
 
 ## Setup
 
@@ -105,6 +105,7 @@ If you're using a supported hosting provider, you can use the `better-env` CLI t
   - Railway adapter: `railway` (or set `railwayBin`)
   - Cloudflare adapter: `wrangler` (or set `wranglerBin`)
   - Fly adapter: `fly` (or set `flyBin`)
+  - Convex adapter: `convex` (or set `convexBin`)
 
 ### Configure `better-env.ts`
 
@@ -170,6 +171,16 @@ export default defineBetterEnv({
 });
 ```
 
+Convex example:
+
+```ts
+import { convexAdapter, defineBetterEnv } from "better-env";
+
+export default defineBetterEnv({
+  adapter: convexAdapter(),
+});
+```
+
 Run initial setup and first sync:
 
 ```bash
@@ -215,6 +226,13 @@ For Fly adapter, local names map to one Fly app secret store:
 - `production` → Fly app secrets (single remote target)
 - `test` → local-only (no remote mapping)
 
+For Convex adapter, local names map to Convex deployments:
+
+- `development` → Convex development deployment
+- `production` → Convex production deployment (`--prod`)
+- `preview` → local-only by default (no remote mapping)
+- `test` → local-only (no remote mapping)
+
 You can override (or add) environments in `better-env.ts`:
 
 ```ts
@@ -244,6 +262,11 @@ Notes: `better-env` never writes to `.env.local` (use it as your local override)
 - `better-env pull` is not supported for Fly secrets (`fly secrets list` does not expose secret values).
 - Set `BETTER_ENV_FLY_APP` or configure `flyAdapter({ app: "your-app-name" })`, unless your `fly.toml` already defines `app = "..."`
 - Fly currently has one secret store per app, so `development`, `preview`, and `production` all target the same remote secret set by default.
+
+### Convex + better-env
+
+- `better-env pull` is supported for Convex.
+- Default mappings support `development` and `production` remotes; `preview` is local-only unless you define a custom mapping in `better-env.ts`.
 
 ## CLI Command Reference
 

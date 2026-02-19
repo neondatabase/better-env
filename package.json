@@ -24,6 +24,7 @@
     "./adapters/cloudflare": "./dist/adapters/cloudflare.js",
     "./adapters/railway": "./dist/adapters/railway.js",
     "./adapters/fly": "./dist/adapters/fly.js",
+    "./adapters/convex": "./dist/adapters/convex.js",
     "./config-schema": "./dist/config-schema/index.js",
     "./validate-env": "./dist/validate-env/index.js"
   },
@@ -44,6 +45,7 @@
     "test:e2e:railway:runtime": "bun test test/e2e/runtime-railway.test.ts",
     "test:e2e:cloudflare": "bun test test/e2e/runtime-cloudflare.test.ts",
     "test:e2e:fly:runtime": "bun test test/e2e/runtime-fly.test.ts",
+    "test:e2e:convex:runtime": "bun test test/e2e/runtime-convex.test.ts",
     "test:watch": "bun test --watch",
     "typecheck": "tsc --noEmit",
     "typecheck:ci": "tsc --noEmit -p tsconfig.ci.json",

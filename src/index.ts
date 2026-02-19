@@ -17,6 +17,8 @@ export { railwayAdapter } from "./lib/adapters/railway.ts";
 export type { RailwayAdapterOptions } from "./lib/adapters/railway.ts";
 export { flyAdapter } from "./lib/adapters/fly.ts";
 export type { FlyAdapterOptions } from "./lib/adapters/fly.ts";
+export { convexAdapter } from "./lib/adapters/convex.ts";
+export type { ConvexAdapterOptions } from "./lib/adapters/convex.ts";
 
 export {
   configSchema,

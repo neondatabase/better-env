@@ -1,0 +1,101 @@
+#!/usr/bin/env bun
+import fs from "node:fs";
+import path from "node:path";
+
+const argv = process.argv.slice(2);
+const normalized = stripGlobals(argv);
+
+if (normalized[0] === "--version") {
+  console.log("convex 0.0.0-test");
+  process.exit(0);
+}
+
+if (normalized[0] === "env" && normalized[1] === "list") {
+  const deployment = readDeployment(normalized);
+  const store = readStore();
+  const vars = store.deployments[deployment] ?? {};
+  const lines = Object.entries(vars)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`);
+  console.log(lines.join("\n"));
+  process.exit(0);
+}
+
+if (normalized[0] === "env" && normalized[1] === "set") {
+  const key = normalized[2];
+  const value = normalized[3];
+  if (!key || value === undefined) {
+    console.error("Missing args for env set");
+    process.exit(1);
+  }
+
+  const deployment = readDeployment(normalized);
+  const store = readStore();
+  store.deployments[deployment] ??= {};
+  store.deployments[deployment][key] = value;
+  writeStore(store);
+  process.exit(0);
+}
+
+if (normalized[0] === "env" && normalized[1] === "remove") {
+  const key = normalized[2];
+  if (!key) {
+    console.error("Missing key for env remove");
+    process.exit(1);
+  }
+
+  const deployment = readDeployment(normalized);
+  const store = readStore();
+  store.deployments[deployment] ??= {};
+  if (!Object.hasOwn(store.deployments[deployment], key)) {
+    console.error("Not found");
+    process.exit(1);
+  }
+  delete store.deployments[deployment][key];
+  writeStore(store);
+  process.exit(0);
+}
+
+console.error(`Unsupported fake convex invocation: ${normalized.join(" ")}`);
+process.exit(1);
+
+function stripGlobals(args: string[]): string[] {
+  return args.filter((token) => token !== "--no-color");
+}
+
+function readDeployment(args: string[]): string {
+  return args.includes("--prod") ? "production" : "development";
+}
+
+type Store = {
+  deployments: Record<string, Record<string, string>>;
+};
+
+function storePath(): string {
+  return path.join(process.cwd(), ".better-env-test", "convex-store.json");
+}
+
+function readStore(): Store {
+  const p = storePath();
+  if (!fs.existsSync(p)) {
+    return { deployments: {} };
+  }
+  const raw = fs.readFileSync(p, "utf8");
+  const parsed = JSON.parse(raw);
+  if (!isStore(parsed)) {
+    return { deployments: {} };
+  }
+  return parsed;
+}
+
+function writeStore(store: Store): void {
+  const dir = path.dirname(storePath());
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(storePath(), JSON.stringify(store, null, 2), "utf8");
+}
+
+function isStore(value: unknown): value is Store {
+  if (typeof value !== "object" || value === null) return false;
+  if (!("deployments" in value)) return false;
+  return true;
+}
