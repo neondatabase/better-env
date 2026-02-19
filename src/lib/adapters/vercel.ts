@@ -38,6 +38,13 @@ export function vercelAdapter(
 
   return {
     name: "vercel",
+    defaultIgnoreUnusedByEnvironment() {
+      return {
+        development: ["VERCEL_OIDC_TOKEN"],
+        preview: ["VERCEL_OIDC_TOKEN"],
+        production: ["VERCEL_OIDC_TOKEN"],
+      };
+    },
 
     async init(ctx, { yes }) {
       const version = await run(ctx, ["--version"]);

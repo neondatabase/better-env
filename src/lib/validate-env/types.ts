@@ -9,4 +9,8 @@ export type ValidateEnvOptions = {
    * Default: process.cwd()
    */
   projectDir?: string;
+  /**
+   * Additional env var keys to suppress in unused variable warnings.
+   */
+  ignoredUnusedEnvVars?: string[];
 };

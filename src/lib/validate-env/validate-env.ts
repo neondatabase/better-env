@@ -11,6 +11,50 @@ const red = (s: string) => `\x1b[31m${s}\x1b[0m`;
 const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
 const bold = (s: string) => `\x1b[1m${s}\x1b[0m`;
 
+const BUILT_IN_IGNORED_UNUSED_ENV_VARS = [
+  // System
+  "NODE_ENV",
+  "PATH",
+  "HOME",
+  "USER",
+  "SHELL",
+  "TERM",
+  "LANG",
+  "PWD",
+  "OLDPWD",
+  "HOSTNAME",
+  "LOGNAME",
+  "TMPDIR",
+  "XDG_CONFIG_HOME",
+  "XDG_DATA_HOME",
+  "XDG_CACHE_HOME",
+  "CI",
+  "TZ",
+  // Vercel
+  "VERCEL",
+  "VERCEL_ENV",
+  "VERCEL_URL",
+  "VERCEL_REGION",
+  "VERCEL_TARGET_ENV",
+  "VERCEL_GIT_COMMIT_SHA",
+  "VERCEL_GIT_COMMIT_MESSAGE",
+  "VERCEL_GIT_COMMIT_AUTHOR_LOGIN",
+  "VERCEL_GIT_COMMIT_AUTHOR_NAME",
+  "VERCEL_GIT_PREVIOUS_SHA",
+  "VERCEL_GIT_PROVIDER",
+  "VERCEL_GIT_REPO_ID",
+  "VERCEL_GIT_REPO_OWNER",
+  "VERCEL_GIT_REPO_SLUG",
+  "VERCEL_GIT_COMMIT_REF",
+  "VERCEL_GIT_PULL_REQUEST_ID",
+  // Build tools (Turbo, NX)
+  "TURBO_CACHE",
+  "TURBO_REMOTE_ONLY",
+  "TURBO_RUN_SUMMARY",
+  "TURBO_DOWNLOAD_LOCAL_ENABLED",
+  "NX_DAEMON",
+] as const;
+
 export async function validateEnv(
   options: ValidateEnvOptions = {},
 ): Promise<{ exitCode: number }> {
@@ -89,6 +133,7 @@ export async function validateEnv(
     projectDir,
     loadedEnvFiles,
     referencedEnvVars,
+    ignoredUnusedEnvVars: options.ignoredUnusedEnvVars,
   });
 
   if (unused.length > 0) {
@@ -145,6 +190,7 @@ async function findUnusedEnvVars(options: {
   projectDir: string;
   loadedEnvFiles: string[];
   referencedEnvVars: ReadonlySet<string>;
+  ignoredUnusedEnvVars?: readonly string[];
 }): Promise<{ name: string; files: string[] }[]> {
   const envVarsInFiles = new Set<string>();
 
@@ -169,48 +215,9 @@ async function findUnusedEnvVars(options: {
     }
   }
 
-  const ignoredVars = new Set([
-    // System
-    "NODE_ENV",
-    "PATH",
-    "HOME",
-    "USER",
-    "SHELL",
-    "TERM",
-    "LANG",
-    "PWD",
-    "OLDPWD",
-    "HOSTNAME",
-    "LOGNAME",
-    "TMPDIR",
-    "XDG_CONFIG_HOME",
-    "XDG_DATA_HOME",
-    "XDG_CACHE_HOME",
-    "CI",
-    "TZ",
-    // Vercel
-    "VERCEL",
-    "VERCEL_ENV",
-    "VERCEL_URL",
-    "VERCEL_REGION",
-    "VERCEL_TARGET_ENV",
-    "VERCEL_GIT_COMMIT_SHA",
-    "VERCEL_GIT_COMMIT_MESSAGE",
-    "VERCEL_GIT_COMMIT_AUTHOR_LOGIN",
-    "VERCEL_GIT_COMMIT_AUTHOR_NAME",
-    "VERCEL_GIT_PREVIOUS_SHA",
-    "VERCEL_GIT_PROVIDER",
-    "VERCEL_GIT_REPO_ID",
-    "VERCEL_GIT_REPO_OWNER",
-    "VERCEL_GIT_REPO_SLUG",
-    "VERCEL_GIT_COMMIT_REF",
-    "VERCEL_GIT_PULL_REQUEST_ID",
-    // Build tools (Turbo, NX)
-    "TURBO_CACHE",
-    "TURBO_REMOTE_ONLY",
-    "TURBO_RUN_SUMMARY",
-    "TURBO_DOWNLOAD_LOCAL_ENABLED",
-    "NX_DAEMON",
+  const ignoredVars = new Set<string>([
+    ...BUILT_IN_IGNORED_UNUSED_ENV_VARS,
+    ...(options.ignoredUnusedEnvVars ?? []),
   ]);
 
   const unused: { name: string; files: string[] }[] = [];

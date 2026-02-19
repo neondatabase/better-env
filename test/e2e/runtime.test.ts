@@ -131,6 +131,58 @@ describe("better-env runtime (e2e)", () => {
     expect(envPreview).toContain("B=22");
     expect(envPreview).toContain("C=3");
   });
+
+  it("validate ignores adapter defaults and per-env ignoreUnused keys", async () => {
+    const projectDir = await makeTempProject();
+    await writeConfig(projectDir, {
+      environmentsBlock:
+        '{ development: { envFile: ".env.development", remote: "development", ignoreUnused: ["MANUAL_IGNORE"] } }',
+    });
+    await writeValidationConfigModule(projectDir);
+    await fs.promises.writeFile(
+      path.join(projectDir, ".env.development"),
+      [
+        "REFERENCED_KEY=ok",
+        "VERCEL_OIDC_TOKEN=token",
+        "MANUAL_IGNORE=1",
+        "UNUSED_SHOULD_WARN=1",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const validate = await runCli(projectDir, [
+      "validate",
+      "--environment",
+      "development",
+    ]);
+    expect(validate.exitCode).toBe(0);
+    expect(validate.stdout).toContain("UNUSED_SHOULD_WARN");
+    expect(validate.stdout).not.toContain("VERCEL_OIDC_TOKEN");
+    expect(validate.stdout).not.toContain("MANUAL_IGNORE");
+  });
+
+  it("validate applies ignoreUnused only for the active environment", async () => {
+    const projectDir = await makeTempProject();
+    await writeConfig(projectDir, {
+      environmentsBlock:
+        '{ preview: { envFile: ".env.preview", remote: "preview", ignoreUnused: ["PREVIEW_ONLY_IGNORE"] } }',
+    });
+    await writeValidationConfigModule(projectDir);
+    await fs.promises.writeFile(
+      path.join(projectDir, ".env.development"),
+      ["REFERENCED_KEY=ok", "PREVIEW_ONLY_IGNORE=1", ""].join("\n"),
+      "utf8",
+    );
+
+    const validate = await runCli(projectDir, [
+      "validate",
+      "--environment",
+      "development",
+    ]);
+    expect(validate.exitCode).toBe(0);
+    expect(validate.stdout).toContain("PREVIEW_ONLY_IGNORE");
+  });
 });
 
 async function makeTempProject(): Promise<string> {
@@ -139,13 +191,19 @@ async function makeTempProject(): Promise<string> {
   return dir;
 }
 
-async function writeConfig(projectDir: string): Promise<void> {
+async function writeConfig(
+  projectDir: string,
+  options: { environmentsBlock?: string } = {},
+): Promise<void> {
   const pkgIndexUrl = pathToFileURL(pkgIndexPath).toString();
   const config = [
     `import { defineBetterEnv, vercelAdapter } from ${JSON.stringify(pkgIndexUrl)};`,
     "",
     "export default defineBetterEnv({",
     `  adapter: vercelAdapter({ vercelBin: ${JSON.stringify(fakeVercelBin)} }),`,
+    ...(options.environmentsBlock
+      ? [`  environments: ${options.environmentsBlock},`]
+      : []),
     "});",
     "",
   ].join("\n");
@@ -153,6 +211,16 @@ async function writeConfig(projectDir: string): Promise<void> {
   await fs.promises.writeFile(
     path.join(projectDir, "better-env.ts"),
     config,
+    "utf8",
+  );
+}
+
+async function writeValidationConfigModule(projectDir: string): Promise<void> {
+  const configDir = path.join(projectDir, "src", "lib", "app");
+  await fs.promises.mkdir(configDir, { recursive: true });
+  await fs.promises.writeFile(
+    path.join(configDir, "config.ts"),
+    ["process.env.REFERENCED_KEY;", "export {};", ""].join("\n"),
     "utf8",
   );
 }

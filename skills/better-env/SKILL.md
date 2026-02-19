@@ -21,6 +21,14 @@ Run env validation early so missing or invalid values fail fast before `dev`, `b
 
 `better-env validate --environment <name>` loads `.env*` files with Next.js semantics, discovers `src/lib/*/config.ts` modules, and checks every declared variable from your `configSchema` modules.
 
+If your dotenv files intentionally include keys that are not referenced by config modules, add per-env suppressions in `better-env.ts`:
+
+`environments.<env>.ignoreUnused: string[]`
+
+These suppress only the selected local environment during `validate`.
+Adapter defaults are merged in automatically; for Vercel,
+`VERCEL_OIDC_TOKEN` is ignored by default in `development`, `preview`, and `production`.
+
 Learn more:
 
 - `references/env-validation.md`

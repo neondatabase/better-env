@@ -13,6 +13,11 @@ export type BetterEnvEnvironmentConfig = {
    * If null/undefined, the environment is treated as local-only (no pull/push).
    */
   remote?: string | null;
+  /**
+   * Env var keys that should not be reported as unused during `better-env validate`
+   * for this environment.
+   */
+  ignoreUnused?: string[];
 };
 
 export type BetterEnvLoadMode = "add" | "update" | "upsert" | "replace";
@@ -44,6 +49,14 @@ export type BetterEnvAdapter = {
   defaultEnvironments?: () => Record<
     BetterEnvEnvironmentName,
     BetterEnvEnvironmentConfig
+  >;
+  /**
+   * Optional adapter-provided env var keys to suppress in `better-env validate`
+   * when computing unused vars, keyed by local environment name.
+   */
+  defaultIgnoreUnusedByEnvironment?: () => Record<
+    BetterEnvEnvironmentName,
+    string[]
   >;
   init: (
     ctx: BetterEnvAdapterContext,

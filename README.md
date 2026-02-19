@@ -241,7 +241,11 @@ import { defineBetterEnv, vercelAdapter } from "better-env";
 export default defineBetterEnv({
   adapter: vercelAdapter(),
   environments: {
-    development: { envFile: ".env.development", remote: "development" },
+    development: {
+      envFile: ".env.development",
+      remote: "development",
+      ignoreUnused: ["A_PROVIDER_PROVIDED_ENV_VAR"],
+    },
     preview: { envFile: ".env.preview", remote: "preview" },
     production: { envFile: ".env.production", remote: "production" },
     test: { envFile: ".env.test", remote: null },
@@ -250,6 +254,10 @@ export default defineBetterEnv({
 ```
 
 Notes: `better-env` never writes to `.env.local` (use it as your local override).
+
+`environments.<env>.ignoreUnused` suppresses selected unused-variable warnings in `better-env validate` for that local environment only.
+
+Adapter defaults are additive. For example, the Vercel adapter includes `VERCEL_OIDC_TOKEN` in the ignore list for `development`, `preview`, and `production`.
 
 ### Cloudflare + better-env
 
@@ -272,7 +280,7 @@ Notes: `better-env` never writes to `.env.local` (use it as your local override)
 
 - `init`: creates `better-env.ts` when missing (prompt or `--yes`), then validates provider CLI availability and verifies project linkage when required (`.vercel/project.json` or `.netlify/state.json`)
 - `pull`: fetches remote variables and ensures local `.gitignore` coverage
-- `validate`: validates required variables by loading `config.ts` modules
+- `validate`: validates required variables by loading `config.ts` modules and reports unused vars (supports per-env `ignoreUnused`)
 - `add|upsert|update|delete`: applies single-variable mutations to the remote provider
 - `load`: applies dotenv file contents using `add|update|upsert|replace` modes
 - `environments list`: prints configured local/remote environment mappings

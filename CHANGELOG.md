@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-02-19
+
+- Added per-environment `ignoreUnused` support in `better-env.ts` so `better-env validate` can suppress specific unused dotenv keys per local environment.
+- Added adapter-level default unused-ignore support.
+- Vercel adapter now ignores `VERCEL_OIDC_TOKEN` by default for `development`, `preview`, and `production` validation runs.
+- `better-env validate` now uses `better-env.ts` when available to merge adapter defaults with env-specific `ignoreUnused` values.
+
 ## 0.2.0 - 2026-02-18
 
 - `better-env init` now bootstraps `better-env.ts` when missing with an adapter selection prompt.

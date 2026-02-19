@@ -32,9 +32,31 @@ export async function runCli(argv: string[]): Promise<void> {
 
   const cwd = parsed.flags.cwd ?? process.cwd();
   if (cmd === "validate") {
+    let projectDir = cwd;
+    let ignoredUnusedEnvVars: string[] | undefined;
+    const environment =
+      parsed.flags.environment ?? process.env.NODE_ENV ?? "development";
+
+    try {
+      const configModule = await loadBetterEnvConfig({ cwd });
+      projectDir = resolveProjectDir(configModule);
+
+      const adapterDefaults =
+        configModule.config.adapter.defaultIgnoreUnusedByEnvironment?.() ?? {};
+      const adapterIgnored = adapterDefaults[environment] ?? [];
+      const configuredIgnored =
+        configModule.config.environments?.[environment]?.ignoreUnused ?? [];
+      ignoredUnusedEnvVars = Array.from(
+        new Set([...adapterIgnored, ...configuredIgnored]),
+      );
+    } catch {
+      // Validate is supported without better-env.ts; fall back to built-in ignores only.
+    }
+
     const res = await validateEnv({
-      environment: parsed.flags.environment,
-      projectDir: cwd,
+      environment,
+      projectDir,
+      ignoredUnusedEnvVars,
     });
     process.exit(res.exitCode);
   }

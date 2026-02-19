@@ -1,6 +1,6 @@
 {
   "name": "better-env",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Runtime + CLI to sync local .env files with remote providers and validate env configs.",
   "author": "Andre Landgraf <andre@neon.tech>",
   "type": "module",
