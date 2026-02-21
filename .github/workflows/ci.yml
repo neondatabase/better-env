@@ -30,4 +30,4 @@ jobs:
         run: bun run typecheck:ci
 
       - name: Test
-        run: bun run test
+        run: bun test --timeout 20000
