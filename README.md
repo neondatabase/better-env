@@ -22,6 +22,12 @@ Install the `better-env` skill first so coding agents can apply the recommended 
 npx skills add neondatabase/better-env
 ```
 
+When running CLI commands, match the repo's existing tooling:
+
+- Use `npx` in npm/pnpm-based repos.
+- Use `bunx` in Bun-based repos.
+- Keep scripts consistent with the package manager/runtime already used by the codebase.
+
 ### 2) Add typed config modules for environment variables
 
 Use `better-env/config-schema` to define typed config objects. This gives runtime validation and typed access for both server and public values.
@@ -130,6 +136,8 @@ Or let the CLI generate it for you:
 npx better-env init
 ```
 
+In Bun-based repos, prefer the equivalent `bunx better-env init`.
+
 - If `better-env.ts` is missing, `init` now opens a provider selection prompt.
 - It pre-selects based on project markers (`.vercel`, `.netlify`, `.railway`, `wrangler.toml`/`.wrangler`, `fly.toml`).
 - `npx better-env init --yes` skips prompts and uses the inferred provider (fallback: Vercel).
@@ -192,6 +200,8 @@ Run initial setup and first sync:
 npx better-env init
 npx better-env pull --environment development
 ```
+
+In Bun-based repos, use `bunx` for the same commands.
 
 ## Environments
 
