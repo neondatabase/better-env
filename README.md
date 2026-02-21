@@ -83,6 +83,11 @@ This keeps ownership clear and allows validation to discover config declarations
 
 If your project follows the `config.ts` convention, you can use the `better-env validate` command to validate your current app enviornment against your application's config schemas.
 
+`validate` supports TypeScript config modules in both runtimes:
+
+- `bunx better-env validate` uses Bun's native TypeScript runtime.
+- `npx better-env validate` and npm scripts (for example `"env:validate:dev": "better-env validate --environment development"`) work with `.ts` configs out of the box.
+
 ```json
 {
   "scripts": {

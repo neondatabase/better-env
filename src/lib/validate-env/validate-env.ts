@@ -1,8 +1,8 @@
 import nextEnv from "@next/env";
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import type { ValidateEnvOptions } from "./types.ts";
+import { loadModuleFromPath } from "../runtime/load-module.ts";
 
 // ANSI colors
 const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
@@ -108,7 +108,7 @@ export async function validateEnv(
     const absolutePath = path.join(projectDir, configFile);
 
     try {
-      await import(pathToImportUrl(absolutePath));
+      await loadModuleFromPath(absolutePath);
       console.log(green(`  ✓ ${relativePath}`));
       validated.push(relativePath);
     } catch (err) {
@@ -180,10 +180,6 @@ function trackEnvAccess(referencedEnvVars: Set<string>): void {
 function coerceError(err: unknown): Error {
   if (err instanceof Error) return err;
   return new Error(typeof err === "string" ? err : "Unknown error");
-}
-
-function pathToImportUrl(absolutePath: string): string {
-  return pathToFileURL(absolutePath).toString();
 }
 
 async function findUnusedEnvVars(options: {

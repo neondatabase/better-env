@@ -6,8 +6,10 @@ import { pathToFileURL } from "node:url";
 
 const packageRoot = path.resolve(import.meta.dir, "..", "..");
 const cliPath = path.join(packageRoot, "src", "cli.ts");
+const distCliPath = path.join(packageRoot, "dist", "cli.js");
 const pkgIndexPath = path.join(packageRoot, "src", "index.ts");
 const fakeVercelBin = path.join(packageRoot, "test", "bin", "vercel");
+let distBuildPromise: Promise<void> | undefined;
 
 beforeAll(async () => {
   await fs.promises.chmod(fakeVercelBin, 0o755);
@@ -183,6 +185,47 @@ describe("better-env runtime (e2e)", () => {
     expect(validate.exitCode).toBe(0);
     expect(validate.stdout).toContain("PREVIEW_ONLY_IGNORE");
   });
+
+  it("validate works via Node CLI with better-env.ts and config.ts", async () => {
+    await ensureDistCliBuilt();
+    const projectDir = await makeTempProject();
+    await writeValidationOnlyConfig(projectDir);
+    await writeValidationConfigModule(projectDir);
+    await fs.promises.writeFile(
+      path.join(projectDir, ".env.development"),
+      ["REFERENCED_KEY=ok", ""].join("\n"),
+      "utf8",
+    );
+
+    const validate = await runNodeDistCli(projectDir, [
+      "validate",
+      "--environment",
+      "development",
+    ]);
+
+    expect(validate.exitCode).toBe(0);
+    expect(validate.stdout).toContain("✓ src/lib/app/config.ts");
+  });
+
+  it("validate works via Node CLI without better-env.ts", async () => {
+    await ensureDistCliBuilt();
+    const projectDir = await makeTempProject();
+    await writeValidationConfigModule(projectDir);
+    await fs.promises.writeFile(
+      path.join(projectDir, ".env.development"),
+      ["REFERENCED_KEY=ok", ""].join("\n"),
+      "utf8",
+    );
+
+    const validate = await runNodeDistCli(projectDir, [
+      "validate",
+      "--environment",
+      "development",
+    ]);
+
+    expect(validate.exitCode).toBe(0);
+    expect(validate.stdout).toContain("✓ src/lib/app/config.ts");
+  });
 });
 
 async function makeTempProject(): Promise<string> {
@@ -225,6 +268,58 @@ async function writeValidationConfigModule(projectDir: string): Promise<void> {
   );
 }
 
+async function writeValidationOnlyConfig(projectDir: string): Promise<void> {
+  const config = [
+    "export default {",
+    "  adapter: {",
+    '    name: "test",',
+    "    async init() {},",
+    "    async pull() {},",
+    "    async add() {},",
+    "    async upsert() {},",
+    "    async update() {},",
+    "    async delete() {},",
+    "    async listEnvironments() {",
+    "      return [];",
+    "    },",
+    "  },",
+    "};",
+    "",
+  ].join("\n");
+
+  await fs.promises.writeFile(
+    path.join(projectDir, "better-env.ts"),
+    config,
+    "utf8",
+  );
+}
+
+async function ensureDistCliBuilt(): Promise<void> {
+  if (!distBuildPromise) {
+    distBuildPromise = (async () => {
+      const proc = Bun.spawn(["bun", "run", "build"], {
+        cwd: packageRoot,
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+
+      const [stdout, stderr, exitCode] = await Promise.all([
+        new Response(proc.stdout).text(),
+        new Response(proc.stderr).text(),
+        proc.exited,
+      ]);
+
+      if (exitCode !== 0) {
+        throw new Error(
+          `Failed to build dist for Node runtime test.\n${stdout}\n${stderr}`,
+        );
+      }
+    })();
+  }
+
+  await distBuildPromise;
+}
+
 async function runCli(
   projectDir: string,
   args: string[],
@@ -239,6 +334,28 @@ async function runCli(
     env: {
       ...process.env,
       PATH: envPath,
+    },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+
+  const [stdout, stderr, exitCode] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
+
+  return { exitCode, stdout, stderr };
+}
+
+async function runNodeDistCli(
+  projectDir: string,
+  args: string[],
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const proc = Bun.spawn(["node", distCliPath, ...args], {
+    cwd: projectDir,
+    env: {
+      ...process.env,
     },
     stdout: "pipe",
     stderr: "pipe",
