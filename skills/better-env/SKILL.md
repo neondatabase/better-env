@@ -48,6 +48,12 @@ Learn more:
 
 The CLI gives a consistent workflow for initialization, sync, validation, and remote variable management, which is great for local development and CI automation.
 
+Choose the command runner to match the repo:
+
+- Use `npx` in npm/pnpm-based repos (for example lockfiles like `package-lock.json` or `pnpm-lock.yaml` and scripts run via `npm`/`pnpm`).
+- Use `bunx` in Bun-based repos (for example `bun.lock` and scripts run via `bun`).
+- Keep commands aligned with the project's existing package manager/runtime conventions; do not mix runners unless the repo already does.
+
 Recommended flow in a repo:
 
 1. Run `better-env init` once to verify adapter prerequisites.

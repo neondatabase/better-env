@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import type { BetterEnvAdapter, BetterEnvConfig } from "./types.ts";
 import { findUp } from "../fs/find-up.ts";
+import { loadModuleFromPath } from "./load-module.ts";
 
 export type LoadedBetterEnvConfig = {
   configPath: string;
@@ -19,10 +19,12 @@ export async function loadBetterEnvConfig(options: {
     );
   }
 
-  const mod = await import(pathToFileURL(configPath).toString());
+  const mod = await loadModuleFromPath(configPath);
 
   const candidate =
-    "default" in mod && mod.default !== undefined ? mod.default : mod;
+    isRecord(mod) && "default" in mod && mod.default !== undefined
+      ? mod.default
+      : mod;
 
   const config = coerceConfig(candidate);
 
