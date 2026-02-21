@@ -22,12 +22,6 @@ Install the `better-env` skill first so coding agents can apply the recommended 
 npx skills add neondatabase/better-env
 ```
 
-When running CLI commands, match the repo's existing tooling:
-
-- Use `npx` in npm/pnpm-based repos.
-- Use `bunx` in Bun-based repos.
-- Keep scripts consistent with the package manager/runtime already used by the codebase.
-
 ### 2) Add typed config modules for environment variables
 
 Use `better-env/config-schema` to define typed config objects. This gives runtime validation and typed access for both server and public values.
@@ -88,11 +82,6 @@ This keeps ownership clear and allows validation to discover config declarations
 ### 3) Add and run environment validation
 
 If your project follows the `config.ts` convention, you can use the `better-env validate` command to validate your current app enviornment against your application's config schemas.
-
-`validate` supports TypeScript config modules in both runtimes:
-
-- `bunx better-env validate` uses Bun's native TypeScript runtime.
-- `npx better-env validate` and npm scripts (for example `"env:validate:dev": "better-env validate --environment development"`) work with `.ts` configs out of the box.
 
 ```json
 {

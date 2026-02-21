@@ -4,7 +4,6 @@
 
 - Added Node runtime TypeScript loading for CLI-imported config modules via `jiti`.
 - `npx better-env validate` and npm scripts now support `better-env.ts` plus discovered `src/lib/*/config.ts` without extra runtime flags.
-- Added runtime e2e coverage for Node CLI validation with and without `better-env.ts`.
 
 ## 0.3.0 - 2026-02-19
 
