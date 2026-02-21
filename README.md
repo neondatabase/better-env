@@ -125,6 +125,8 @@ Or let the CLI generate it for you:
 npx better-env init
 ```
 
+In Bun-based repos, prefer the equivalent `bunx better-env init`.
+
 - If `better-env.ts` is missing, `init` now opens a provider selection prompt.
 - It pre-selects based on project markers (`.vercel`, `.netlify`, `.railway`, `wrangler.toml`/`.wrangler`, `fly.toml`).
 - `npx better-env init --yes` skips prompts and uses the inferred provider (fallback: Vercel).
@@ -187,6 +189,8 @@ Run initial setup and first sync:
 npx better-env init
 npx better-env pull --environment development
 ```
+
+In Bun-based repos, use `bunx` for the same commands.
 
 ## Environments
 

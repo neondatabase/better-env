@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - 2026-02-20
+
+- Added Node runtime TypeScript loading for CLI-imported config modules via `jiti`.
+- `npx better-env validate` and npm scripts now support `better-env.ts` plus discovered `src/lib/*/config.ts` without extra runtime flags.
+
 ## 0.3.0 - 2026-02-19
 
 - Added per-environment `ignoreUnused` support in `better-env.ts` so `better-env validate` can suppress specific unused dotenv keys per local environment.
