@@ -53,13 +53,23 @@ Default mapping:
 - `production`: `.env.production` ← remote `production`
 - `test`: `.env.test` ← local-only (`remote: null`)
 
-Override example:
+For Vercel defaults, omit `environments` entirely.
+Only define it when you need behavior different from defaults.
+
+Important: `environments` is a full replacement, not a partial merge.
+If you define it, include every local environment you plan to use.
+
+Override example (custom behavior):
 
 ```ts
 environments: {
-  development: { envFile: ".env.development", remote: "development" },
+  development: { envFile: ".env", remote: "development" },
   preview: { envFile: ".env.preview", remote: "preview" },
   production: { envFile: ".env.production", remote: "production" },
-  test: { envFile: ".env.test", remote: null },
+  test: {
+    envFile: ".env.test",
+    remote: null,
+    ignoreUnused: ["A_PROVIDER_PROVIDED_ENV_VAR"],
+  },
 }
 ```
