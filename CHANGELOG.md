@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 - 2026-05-24
+
+- Internal: validate secure release pipeline (OIDC + staged publish + provenance).
+
 ## 0.3.1 - 2026-02-20
 
 - Added Node runtime TypeScript loading for CLI-imported config modules via `jiti`.
