@@ -1,6 +1,11 @@
 # dependencies (bun install)
 node_modules
 
+# stray npm/yarn/pnpm lockfiles — this repo uses bun (bun.lock is the source of truth)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 # output
 out
 dist
@@ -26,6 +31,10 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .eslintcache
 .cache
 *.tsbuildinfo
+.fallow/
+
+# test artifacts
+.tmp/
 
 # IntelliJ based IDEs
 .idea

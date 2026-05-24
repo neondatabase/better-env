@@ -305,12 +305,17 @@ better-env environments list
 
 ## Contribution
 
+See [`AGENTS.md`](AGENTS.md) for the full dev environment, PR workflow, and quality-pass conventions. See [`docs/RELEASING.md`](docs/RELEASING.md) for the npm release pipeline (OIDC trusted publishing + staged approval).
+
 Run local checks:
 
 ```bash
-npm run build
-npm run typecheck
-npm test
+bun install
+bun run fmt:check
+bun run typecheck
+bun test
+bun run build
+bun run fallow
 ```
 
 Run adapter e2e coverage:
