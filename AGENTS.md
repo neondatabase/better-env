@@ -6,7 +6,7 @@ A runtime + CLI to sync local `.env` files with remote providers (Vercel, Netlif
 
 - Use bun as the package manager and to run `package.json` scripts (`bun install`, `bun run <script>`). `bun.lock` is the source of truth; stray `package-lock.json` / `yarn.lock` / `pnpm-lock.yaml` files are gitignored.
 - Tests run under Bun's built-in runner (`bun test`). Live provider e2e tests are gated behind `BETTER_ENV_REAL_<PROVIDER>_E2E=1` so the default `bun test` run does not hit real cloud accounts.
-- [Fallow](https://github.com/fallow-rs/fallow) is a dev dependency (`bun run fallow`). It reports unused code, duplication, and complexity across the repo. CI runs it in advisory mode (job does not fail on findings); fix what matters locally and ignore noise when appropriate.
+- [Fallow](https://github.com/fallow-rs/fallow) is a local dev dependency (`bun run fallow`). It reports unused code, duplication, and complexity across the repo; fix what matters locally and ignore noise when appropriate. It does not run in GitHub Actions.
 
 ## Changelog
 
@@ -25,7 +25,7 @@ A runtime + CLI to sync local `.env` files with remote providers (Vercel, Netlif
 9. **README** — update only if end users need to know about a new or changed feature.
 10. **PR** — push your branch and open a pull request against `main`.
 
-CI runs format check, typecheck, the default `bun test` suite (runtime adapter e2e + unit), build, and Fallow (advisory). Keep local runs of the full `bun test` script green before you rely on CI.
+CI runs format check, typecheck, the default `bun test` suite (runtime adapter e2e + unit), and build. Keep local runs of the full `bun test` script green before you rely on CI.
 
 ## Releasing
 
