@@ -38,42 +38,38 @@ flowchart LR
 - **WebAuthn/passkey 2FA** on the npm account — phishing-resistant (TOTP is being phased out by npm).
 - **SHA-pinned third-party Actions** in `release.yml` — neutralises Action-side compromises (a malicious force-push to a tag cannot move the pin).
 
-## One-time setup checklist
+## Setup state
 
-Work through these top to bottom. None of them can be automated; they are all in the npm and GitHub web UIs. Tick each off when done.
+The pipeline is live. `v0.3.2` was published through it on 2026-05-24, which is itself the
+end-to-end proof that trusted publishing, staged publish, and provenance all work.
 
-### A. npm account hardening
+### GitHub repository (`neon-solutions/better-env`)
 
-> Done under your personal npm user, not the package.
+Verified against the API on 2026-08-10:
 
-- [ ] **A1.** Enable WebAuthn/passkey 2FA at `https://www.npmjs.com/settings/<your-username>/2fa`. If TOTP is your only second factor, enroll a passkey and then remove TOTP. New TOTP setups are disabled by npm and existing TOTP is being phased out.
-- [ ] **A2.** Revoke every existing publish token at `https://www.npmjs.com/settings/<your-username>/tokens` that grants write access to `better-env`. After trusted publishing is configured, nothing should need one.
+| What                           | State                                                                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tag protection                 | Ruleset "release tags", active, targets `refs/tags/v*`, restricts creation, update, deletion                                                 |
+| `main` protection              | Ruleset "main", active: pull request with 1 approving review, signed commits required, no deletion, no force-push. Repo admins keep a bypass |
+| Default workflow permissions   | `read` — `release.yml` still gets `id-token: write` because a job may request more than the default, just not more than the repo allows      |
+| Actions creating/approving PRs | Off                                                                                                                                          |
 
-### B. npm package configuration
+`main` is protected by a **repo ruleset**, not classic branch protection, so
+`repos/.../branches/main/protection` returns 404. That is not an unprotected branch — read
+`repos/.../rulesets` instead.
 
-> Done on the `better-env` package page on npmjs.com.
+### npm
 
-- [ ] **B1.** Go to `https://www.npmjs.com/package/better-env/access`. Under **Trusted Publisher**, click **GitHub Actions** and enter:
-  - Organization: `neon-solutions`
-  - Repository: `better-env`
-  - Workflow filename: `release.yml`
-  - Allowed actions: select **`npm stage publish` only**. **Do not** check `npm publish`.
-  - Save.
+These live in the npm web UI and cannot be read back from here. Re-confirm them on
+`https://www.npmjs.com/package/better-env/access` if a publish ever behaves unexpectedly:
 
-  Selecting stage-only is the single most important hardening switch in this whole pipeline: it forces every CI publish through the stage-approve gate. Even if `release.yml` were compromised, the attacker still cannot push live without your WebAuthn approval.
-
-- [ ] **B2.** On the same page, find **Publishing access** and choose **"Require two-factor authentication and disallow tokens"**. Save. From this point any publish that is not OIDC + 2FA-approved staged release is rejected by the registry.
-
-### C. GitHub repository configuration (`neon-solutions/better-env`)
-
-- [ ] **C1.** Settings -> Rules -> Rulesets -> **New tag ruleset**. Name it "release tags". Target tags matching `v*`. Enable "Restrict creations", "Restrict updates", and "Restrict deletions". Add yourself (and any future co-maintainers) to the bypass list. Save.
-- [ ] **C2.** Settings -> Actions -> General -> **Workflow permissions** = "Read repository contents and packages permissions" (the more restrictive of the two radio buttons). Job-level `id-token: write` in `release.yml` still works because workflow files can request additional permissions explicitly, but they cannot exceed what the repo allows globally.
-- [ ] **C3.** Settings -> Actions -> General -> **Allow GitHub Actions to create and approve pull requests** = OFF.
-- [ ] **C4.** (Recommended) Settings -> Branches -> branch-protection rule on `main`: require pull requests, require CI green, require signed commits, no force-push, no deletions. This is your last line of defence against a malicious commit landing right before a tag.
-
-### D. First-release smoke test
-
-- [ ] **D1.** Cut a patch release through the runbook below (e.g. `v0.3.2` with an empty CHANGELOG entry like "internal: validate release pipeline"). Walk through the stage-review step slowly: open the staged tarball on npmjs.com, confirm the file list matches `package.json#files` (`dist/`, `skills/`, `README.md`), confirm the provenance attestation badge appears, then approve. Once the version is live, run `npm audit signatures better-env@0.3.2` to verify Sigstore signatures end to end.
+- **Trusted Publisher** bound to `neon-solutions/better-env` and workflow `release.yml`, with
+  **`npm stage publish` only** selected and `npm publish` left unchecked. This is the single
+  most important switch in the pipeline: it forces every CI publish through the stage-approve
+  gate, so even a compromised `release.yml` cannot push live without a WebAuthn approval.
+- **Publishing access** set to "Require two-factor authentication and disallow tokens".
+- WebAuthn/passkey 2FA on the maintainer account, and no surviving publish tokens with write
+  access to `better-env`.
 
 ## Per-release runbook
 
