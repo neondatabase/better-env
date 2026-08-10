@@ -57,7 +57,7 @@ jobs:
         run: bun run fmt:check
 
       - name: Type check
-        run: bun run typecheck:ci
+        run: bun run typecheck
 
       - name: Run tests
         run: bun test --timeout 20000

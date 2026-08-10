@@ -17,7 +17,7 @@ A runtime + CLI to sync local `.env` files with remote providers (Vercel, Netlif
 1. **Branch from up-to-date `main`** — `git checkout main && git pull`.
 2. **Implement the change** — keep the diff focused; match existing style and patterns. Adapter-specific code lives under `src/lib/adapters/<provider>.ts` and is paired with a runtime e2e test under `test/e2e/runtime-<provider>.test.ts` that uses a fake CLI binary in `test/bin/<provider>/`.
 3. **Tests** — add or extend tests so behavior and edge cases are covered by the spec. Prefer **e2e tests without mocks**: for adapters, fake the provider CLI via a script in `test/bin/<provider>/` and exercise the runtime through `bun test test/e2e/runtime-<provider>.test.ts`. Live provider tests (`test/e2e/<provider>-live.test.ts`) require an authenticated CLI and the `BETTER_ENV_REAL_<PROVIDER>_E2E=1` env flag.
-4. **Typecheck** — `bun run typecheck` (whole repo) and `bun run typecheck:ci` (only `src/` + `test/`); fix all reported issues. CI runs the `:ci` variant.
+4. **Typecheck** — `bun run typecheck` (`src/` + `test/`); fix all reported issues. The apps under `examples/` are standalone projects with their own tsconfig and are not covered.
 5. **Tests** — `bun test`; fix failures. Live e2e tests are intentionally not part of the default run.
 6. **Quality pass** — run `bun run fmt`, then `bun run build`, `bun run typecheck`, and `bun test` again so formatting, build, types, and tests are all green.
 7. **Fallow** — `bun run fallow` (or `bun run fallow -- --summary`). Address findings that are clearly worth it; not every Fallow warning needs a code change.

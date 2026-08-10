@@ -1,4 +1,8 @@
 {
+  // Only the published package and its tests. The apps under examples/ are
+  // standalone projects with their own tsconfig and their own uninstalled
+  // dependencies, so they cannot be typechecked from here.
+  "include": ["src/**/*.ts", "test/**/*.ts"],
   "compilerOptions": {
     // Environment setup & latest features
     "lib": ["ESNext"],
@@ -7,6 +11,7 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
+    "types": ["bun-types"],
 
     // Bundler mode
     "moduleResolution": "bundler",
