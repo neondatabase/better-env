@@ -7,6 +7,7 @@ A runtime + CLI to sync local `.env` files with remote providers (Vercel, Netlif
 - Use bun as the package manager and to run `package.json` scripts (`bun install`, `bun run <script>`). `bun.lock` is the source of truth; stray `package-lock.json` / `yarn.lock` / `pnpm-lock.yaml` files are gitignored.
 - Tests run under Bun's built-in runner (`bun test`). Live provider e2e tests are gated behind `BETTER_ENV_REAL_<PROVIDER>_E2E=1` so the default `bun test` run does not hit real cloud accounts.
 - [Fallow](https://github.com/fallow-rs/fallow) is a local dev dependency (`bun run fallow`). It reports unused code, duplication, and complexity across the repo; fix what matters locally and ignore noise when appropriate. It does not run in GitHub Actions.
+- **Dependabot is off, deliberately.** It cannot open a mergeable PR here for two independent reasons: it edits `package.json` without touching `bun.lock`, so CI fails at `bun install --frozen-lockfile`; and the apps under `examples/` depend on the package as `"better-env": "link:better-env"`, which npm rejects with `EUNSUPPORTEDPROTOCOL` before the update job can start. Security **alerts** are still on and still show in the Security tab — only the automatic pull requests are disabled. Bump dependencies by hand with `bun update`, which maintains the lockfile. Re-enabling Dependabot without bun lockfile support just restores a permanently red Actions tab.
 
 ## Changelog
 
