@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 - 2026-08-10
+
+- `better-env --help` no longer lists `environments create` and `environments delete`. No adapter ever implemented them and both always exited 1.
+- The bundled agent skill now lists the Fly.io and Convex adapters alongside the other four.
+- Fixed the skill install command in the README, which pointed at the repository's old organization.
+
 ## 0.3.2 - 2026-05-24
 
 - Internal: validate secure release pipeline (OIDC + staged publish + provenance).
