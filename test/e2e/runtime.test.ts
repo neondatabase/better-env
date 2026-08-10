@@ -226,6 +226,47 @@ describe("better-env runtime (e2e)", () => {
     expect(validate.exitCode).toBe(0);
     expect(validate.stdout).toContain("✓ src/lib/app/config.ts");
   });
+
+  it("environments list prints the adapter environments", async () => {
+    const projectDir = await makeTempProject();
+    await writeConfig(projectDir);
+
+    const res = await runCli(projectDir, ["environments", "list"]);
+    expect(res.exitCode).toBe(0);
+    expect(res.stdout.trim().split("\n")).toEqual([
+      "development",
+      "preview",
+      "production",
+    ]);
+  });
+
+  it("environments rejects subcommands other than list", async () => {
+    const projectDir = await makeTempProject();
+    await writeConfig(projectDir);
+
+    const create = await runCli(projectDir, [
+      "environments",
+      "create",
+      "staging",
+    ]);
+    expect(create.exitCode).toBe(1);
+    expect(create.stderr).toContain('Unknown environments subcommand "create"');
+    expect(create.stderr).toContain("Supported: environments list");
+
+    const bare = await runCli(projectDir, ["environments"]);
+    expect(bare.exitCode).toBe(1);
+    expect(bare.stderr).toContain("Missing environments subcommand");
+  });
+
+  it("help does not advertise unimplemented environments subcommands", async () => {
+    const projectDir = await makeTempProject();
+
+    const res = await runCli(projectDir, ["--help"]);
+    expect(res.exitCode).toBe(0);
+    expect(res.stdout).toContain("better-env environments list");
+    expect(res.stdout).not.toContain("environments create");
+    expect(res.stdout).not.toContain("environments delete");
+  });
 });
 
 async function makeTempProject(): Promise<string> {

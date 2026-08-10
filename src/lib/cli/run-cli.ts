@@ -147,20 +147,10 @@ export async function runCli(argv: string[]): Promise<void> {
       }
       return;
     }
-    if (subcmd === "create") {
-      console.error(
-        `Adapter "${configModule.config.adapter.name}" does not support creating environments.`,
-      );
-      process.exit(1);
-    }
-    if (subcmd === "delete") {
-      console.error(
-        `Adapter "${configModule.config.adapter.name}" does not support deleting environments.`,
-      );
-      process.exit(1);
-    }
     console.error(
-      "Unsupported environments subcommand (v1 supports only: environments list)",
+      subcmd
+        ? `Unknown environments subcommand "${subcmd}". Supported: environments list`
+        : "Missing environments subcommand. Supported: environments list",
     );
     process.exit(1);
   }

@@ -16,8 +16,6 @@ export function formatHelp(): string {
     "    Aliases: --add | --update | --upsert | --replace (default: --upsert)",
     "",
     "  better-env environments list",
-    "  better-env environments create <name>",
-    "  better-env environments delete <name>",
     "    Alias: better-env envs list",
     "",
     "Config:",
