@@ -1,6 +1,6 @@
 ---
 name: better-env
-description: Better environment variable management for agents and humans with full type safety, CLI-based remote environment synchronization, and environment validation. Use when setting up typed config schemas, validating env variables, or managing remote env vars across Vercel, Netlify, Railway, Cloudflare, and Fly.io with better-env.
+description: Better environment variable management for agents and humans with full type safety, CLI-based remote environment synchronization, and environment validation. Use when setting up typed config schemas, validating env variables, or managing remote env vars across Vercel, Netlify, Railway, Cloudflare, Fly.io, and Convex with better-env.
 ---
 
 ## Work With better-env In A Repo
@@ -37,7 +37,7 @@ Learn more:
 
 Use runtime configuration to keep local dotenv targets aligned with provider environments while preserving safe defaults.
 
-Create `better-env.ts` with `defineBetterEnv(...)` and an adapter (`vercelAdapter`, `netlifyAdapter`, `railwayAdapter`, or `cloudflareAdapter`).
+Create `better-env.ts` with `defineBetterEnv(...)` and an adapter (`vercelAdapter`, `netlifyAdapter`, `railwayAdapter`, `cloudflareAdapter`, `flyAdapter`, or `convexAdapter`).
 
 For a standard Vercel setup, prefer the minimal config:
 

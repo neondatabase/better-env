@@ -19,7 +19,7 @@ Don't you hate it when your production build fails because you forgot to upload 
 Install the `better-env` skill first so coding agents can apply the recommended conventions and workflows:
 
 ```bash
-npx skills add neondatabase/better-env
+npx skills add neon-solutions/better-env
 ```
 
 ### 2) Add typed config modules for environment variables
