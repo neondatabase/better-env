@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # The apps under examples/ depend on the package as "better-env": "link:better-env",
+  # which npm cannot resolve (EUNSUPPORTEDPROTOCOL). Dependabot fails every run on
+  # them. The link: protocol is load-bearing — the live provider e2e tests copy an
+  # example out of the repo and resolve it through `bun link`, so a relative file:
+  # path would not survive the copy. Excluding the paths is the fix.
+  - package-ecosystem: "npm"
+    directory: "/"
+    exclude-paths:
+      - "examples/**"
+    schedule:
+      interval: "weekly"
