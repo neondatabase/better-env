@@ -200,7 +200,6 @@ By default, `better-env` provides these environment names:
 - `preview` → writes `.env.preview`, pulls from Vercel `preview`
 - `production` → writes `.env.production`, pulls from Vercel `production`
 - `test` → writes `.env.test`, local-only (no remote mapping)
-- `local` → writes `.env.local`, local-only (no remote mapping)
 
 For Netlify adapter, the same local names map to:
 
@@ -287,7 +286,7 @@ Adapter defaults are additive. For example, the Vercel adapter includes `VERCEL_
 - `validate`: validates required variables by loading `config.ts` modules and reports unused vars (supports per-env `ignoreUnused`)
 - `add|upsert|update|delete`: applies single-variable mutations to the remote provider
 - `load`: applies dotenv file contents using `add|update|upsert|replace` modes
-- `environments list`: prints configured local/remote environment mappings
+- `environments list`: prints the remote environment names the adapter supports. These are the provider's names, not the local names you configure — the Netlify adapter prints `dev`, `branch-deploy`, `deploy-preview`, `production`. It does not read `environments` from `better-env.ts`.
 
 ```bash
 better-env init [--yes]
